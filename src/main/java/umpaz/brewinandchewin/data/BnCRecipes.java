@@ -1,6 +1,7 @@
 package umpaz.brewinandchewin.data;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import umpaz.brewinandchewin.data.recipe.BnCCookingPotRecipes;
 import umpaz.brewinandchewin.data.recipe.BnCCookingRecipes;
@@ -26,7 +27,7 @@ public class BnCRecipes extends RecipeProvider
         KegPouringRecipes.register(output);
         BnCCookingPotRecipes.register(output);
         BnCCookingRecipes.register(output);
-        BnCCraftingRecipes.register(output);
+        BnCCraftingRecipes.register(output, provider.lookupOrThrow(Registries.ITEM));
         BnCCuttingBoardRecipes.register(output);
         NMLRecipes.register(output);
     }

@@ -27,22 +27,22 @@ public class BnCCookingRecipes {
 
         SimpleCookingRecipeBuilder.campfireCooking(Ingredient.of(BnCItems.CORN_DOUGH), RecipeCategory.FOOD, BnCItems.TORTILLA, SMALL_EXP, CAMPFIRE_TIME)
                 .unlockedBy("has_corn_dough", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.CORN_DOUGH))
-                .save(consumer, BrewinAndChewin.asResource("tortilla_from_campfire_cooking"));
+                .save(consumer, BrewinAndChewin.asResource("tortilla_from_campfire_cooking").toString());
     }
 
     private static void ovenOnly(RecipeOutput consumer, ItemLike input, ItemLike result, String name) {
         SimpleCookingRecipeBuilder.smelting(Ingredient.of(input), RecipeCategory.FOOD, result, SMALL_EXP, SMELTING_TIME)
                 .unlockedBy("has_" + name, InventoryChangeTrigger.TriggerInstance.hasItems(input))
-                .save(consumer, BrewinAndChewin.asResource(name + "_from_smelting"));
+                .save(consumer, BrewinAndChewin.asResource(name + "_from_smelting").toString());
         SimpleCookingRecipeBuilder.smoking(Ingredient.of(input), RecipeCategory.FOOD, result, SMALL_EXP, SMOKING_TIME)
                 .unlockedBy("has_" + name, InventoryChangeTrigger.TriggerInstance.hasItems(input))
-                .save(consumer, BrewinAndChewin.asResource(name + "_from_smoking"));
+                .save(consumer, BrewinAndChewin.asResource(name + "_from_smoking").toString());
     }
 
     private static void foodSmelting(RecipeOutput consumer, ItemLike input, ItemLike result, String name) {
         ovenOnly(consumer, input, result, name);
         SimpleCookingRecipeBuilder.campfireCooking(Ingredient.of(input), RecipeCategory.FOOD, result, SMALL_EXP, CAMPFIRE_TIME)
                 .unlockedBy("has_" + name, InventoryChangeTrigger.TriggerInstance.hasItems(input))
-                .save(consumer, BrewinAndChewin.asResource(name + "_from_campfire_cooking"));
+                .save(consumer, BrewinAndChewin.asResource(name + "_from_campfire_cooking").toString());
     }
 }
