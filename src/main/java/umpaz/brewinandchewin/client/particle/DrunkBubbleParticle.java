@@ -2,9 +2,10 @@ package umpaz.brewinandchewin.client.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 
-public class DrunkBubbleParticle extends TextureSheetParticle {
+public class DrunkBubbleParticle extends SingleQuadParticle {
    protected DrunkBubbleParticle( ClientLevel level, double x, double y, double z, double motionX, double motionY, double motionZ ) {
       super(level, x, y, z);
       this.scale(2.0F);
@@ -18,12 +19,14 @@ public class DrunkBubbleParticle extends TextureSheetParticle {
       this.zd = motionZ;
    }
 
+   // 26.1 replaced ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT with a per-particle layer.
    @Override
    @NotNull
-   public ParticleRenderType getRenderType() {
-      return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+   public SingleQuadParticle.Layer getLayer() {
+      return SingleQuadParticle.Layer.TRANSLUCENT;
    }
 
+   @Override
    public void tick() {
       this.xo = this.x;
       this.yo = this.y;
@@ -50,12 +53,12 @@ public class DrunkBubbleParticle extends TextureSheetParticle {
       }
 
       @Override
-      public Particle createParticle( DrunkBubbleParticleOptions typeIn, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed ) {
+      public Particle createParticle( DrunkBubbleParticleOptions typeIn, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random ) {
          DrunkBubbleParticle particle = new DrunkBubbleParticle(level, x, y + 0.3D, z, 0.0, 0.002, 0.0);
          particle.setAlpha(0.6F);
          particle.setColor(typeIn.getColor().x, typeIn.getColor().y, typeIn.getColor().z);
          particle.scale(typeIn.getScale());
-         particle.pickSprite(this.spriteSet);
+         particle.setSprite(this.spriteSet.get(random));
          return particle;
       }
    }

@@ -4,15 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 
-public class RagingParticle extends TextureSheetParticle {
+public class RagingParticle extends SingleQuadParticle {
     private static final RandomSource RANDOM = RandomSource.create();
     private final SpriteSet sprites;
 
@@ -38,12 +37,14 @@ public class RagingParticle extends TextureSheetParticle {
         }
     }
 
+    // 26.1 replaced ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT with a per-particle layer.
     @Override
     @NotNull
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
+    @Override
     public void tick() {
         super.tick();
         if (random.nextFloat() < 0.2F)
@@ -71,7 +72,7 @@ public class RagingParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(T typeIn, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(T typeIn, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             return new RagingParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, typeIn.getScale(), spriteSet);
         }
     }
