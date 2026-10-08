@@ -27,7 +27,7 @@ import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.crafting.FluidIngredientWithAmount;
 import umpaz.brewinandchewin.common.crafting.KegFermentingRecipe;
 import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
-import umpaz.brewinandchewin.client.recipebook.FermentingBookCategory;
+import umpaz.brewinandchewin.common.crafting.FermentingBookCategory;
 import umpaz.brewinandchewin.common.utility.FluidUnit;
 import umpaz.brewinandchewin.neoforge.utility.KegCompatibleFluidIngredients;
 

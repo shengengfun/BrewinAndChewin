@@ -11,7 +11,7 @@ import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import umpaz.brewinandchewin.BrewinAndChewin;
-import umpaz.brewinandchewin.client.recipebook.FermentingBookCategory;
+import umpaz.brewinandchewin.common.crafting.FermentingBookCategory;
 import umpaz.brewinandchewin.common.compat.nomansland.NMLIntegration;
 import umpaz.brewinandchewin.common.registry.BnCItems;
 import umpaz.brewinandchewin.common.utility.FluidUnit;

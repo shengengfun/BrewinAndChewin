@@ -1,4 +1,4 @@
-package umpaz.brewinandchewin.client.recipebook;
+package umpaz.brewinandchewin.common.crafting;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
@@ -9,6 +9,7 @@ import net.minecraft.util.StringRepresentable;
 
 import java.util.function.IntFunction;
 
+/** Moved out of the client recipe-book package (the client recipe book is being ported separately). */
 public enum FermentingBookCategory implements StringRepresentable {
     MEALS("meals", 0),
     DRINKS("drinks", 1),

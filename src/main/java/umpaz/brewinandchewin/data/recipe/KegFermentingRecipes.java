@@ -9,7 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
-import umpaz.brewinandchewin.client.recipebook.FermentingBookCategory;
+import umpaz.brewinandchewin.common.crafting.FermentingBookCategory;
 import umpaz.brewinandchewin.common.registry.BnCFluids;
 import umpaz.brewinandchewin.common.registry.BnCItems;
 import umpaz.brewinandchewin.common.tag.BnCTags;

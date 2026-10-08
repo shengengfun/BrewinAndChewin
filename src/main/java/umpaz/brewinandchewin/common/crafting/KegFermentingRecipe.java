@@ -18,7 +18,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import umpaz.brewinandchewin.client.recipebook.FermentingBookCategory;
+import umpaz.brewinandchewin.common.crafting.FermentingBookCategory;
 import umpaz.brewinandchewin.common.BnCConfiguration;
 import umpaz.brewinandchewin.common.registry.BnCItems;
 import umpaz.brewinandchewin.common.registry.BnCRecipeBookCategories;
