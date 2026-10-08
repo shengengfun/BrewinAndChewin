@@ -7,7 +7,6 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.registry.BnCEffects;
 import umpaz.brewinandchewin.common.tag.BnCTags;
@@ -17,8 +16,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class BnCMobEffectTags extends IntrinsicHolderTagsProvider<MobEffect>
 {
-    public BnCMobEffectTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, Registries.MOB_EFFECT, lookupProvider, mobEffect -> BuiltInRegistries.MOB_EFFECT.getResourceKey(mobEffect).orElseThrow(), BrewinAndChewin.MODID, existingFileHelper);
+    public BnCMobEffectTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, Registries.MOB_EFFECT, lookupProvider, mobEffect -> BuiltInRegistries.MOB_EFFECT.getResourceKey(mobEffect).orElseThrow(), BrewinAndChewin.MODID);
     }
 
     @Override

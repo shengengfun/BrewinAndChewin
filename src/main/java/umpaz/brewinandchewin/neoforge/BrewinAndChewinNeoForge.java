@@ -47,6 +47,7 @@ public class BrewinAndChewinNeoForge {
         // 26.1 dropped EventBusSubscriber.Bus, so the mod bus is no longer selectable from the
         // annotation - register those listeners on the mod's own event bus instead.
         container.getEventBus().register(RegistryEvents.class);
+        container.getEventBus().register(umpaz.brewinandchewin.data.BnCDataGenerators.class);
     }
 
     public static class RegistryEvents {

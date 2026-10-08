@@ -1,11 +1,13 @@
 package umpaz.brewinandchewin.data;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.registry.BnCBlocks;
 import net.minecraft.resources.Identifier;
@@ -16,10 +18,12 @@ import vectorwing.farmersdelight.common.tag.ModTags;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
-public class BnCBlockTags extends BlockTagsProvider
+public class BnCBlockTags extends IntrinsicHolderTagsProvider<Block>
 {
-    public BnCBlockTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, BrewinAndChewin.MODID, existingFileHelper);
+    public BnCBlockTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, Registries.BLOCK, lookupProvider,
+                block -> BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow(),
+                BrewinAndChewin.MODID);
     }
 
     @Override

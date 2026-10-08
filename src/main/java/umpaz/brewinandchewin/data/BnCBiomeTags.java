@@ -5,15 +5,14 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.BiomeTagsProvider;
 import net.neoforged.neoforge.common.Tags;
 import umpaz.brewinandchewin.common.compat.nomansland.NMLIntegration;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.world.BnCBiomeFeatures;
 
 import java.util.concurrent.CompletableFuture;
 
 public class BnCBiomeTags extends BiomeTagsProvider {
-    public BnCBiomeTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, BrewinAndChewin.MODID, existingFileHelper);
+    public BnCBiomeTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, BrewinAndChewin.MODID);
     }
 
     @Override

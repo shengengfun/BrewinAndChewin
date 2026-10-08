@@ -1,15 +1,16 @@
 package umpaz.brewinandchewin.data;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.world.item.Item;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import umpaz.brewinandchewin.BrewinAndChewin;
+import umpaz.brewinandchewin.common.registry.BnCBlocks;
 import umpaz.brewinandchewin.common.registry.BnCItems;
 import umpaz.brewinandchewin.common.tag.BnCCompatTags;
 import umpaz.brewinandchewin.common.tag.BnCTags;
@@ -21,10 +22,14 @@ import vectorwing.farmersdelight.common.tag.ModTags;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
-public class BnCItemTags extends ItemTagsProvider {
+public class BnCItemTags extends IntrinsicHolderTagsProvider<Item> {
 
-    public BnCItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> provider, CompletableFuture<TagsProvider.TagLookup<Block>> blockTagProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, provider, blockTagProvider, BrewinAndChewin.MODID, existingFileHelper);
+    // 26.1 removed ItemTagsProvider (and ExistingFileHelper); IntrinsicHolderTagsProvider<Item>
+    // is the equivalent item tag provider.
+    public BnCItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> provider) {
+        super(output, Registries.ITEM, provider,
+                item -> BuiltInRegistries.ITEM.getResourceKey(item).orElseThrow(),
+                BrewinAndChewin.MODID);
     }
 
     @Override
@@ -36,8 +41,13 @@ public class BnCItemTags extends ItemTagsProvider {
     }
 
     private void registerModTags() {
-        copy(BnCTags.Blocks.CHEESE_WHEELS_UNRIPE, BnCTags.Items.CHEESE_WHEELS_UNRIPE);
-        copy(BnCTags.Blocks.CHEESE_WHEELS_RIPE, BnCTags.Items.CHEESE_WHEELS_RIPE);
+        // 26.1 dropped ItemTagsProvider#copy, so the block tags' members are mirrored explicitly.
+        tag(BnCTags.Items.CHEESE_WHEELS_UNRIPE)
+                .add(BnCBlocks.UNRIPE_FLAXEN_CHEESE_WHEEL.asItem())
+                .add(BnCBlocks.UNRIPE_SCARLET_CHEESE_WHEEL.asItem());
+        tag(BnCTags.Items.CHEESE_WHEELS_RIPE)
+                .add(BnCBlocks.FLAXEN_CHEESE_WHEEL.asItem())
+                .add(BnCBlocks.SCARLET_CHEESE_WHEEL.asItem());
         tag(BnCTags.Items.FERMENTED_DRINKS)
                 .add(BnCItems.BEER)
                 .add(BnCItems.MEAD)
@@ -62,7 +72,7 @@ public class BnCItemTags extends ItemTagsProvider {
                 .addOptionalTag(CommonTags.Items.FOODS_COOKED_BACON).addOptionalTag(CommonTags.Items.FOODS_COOKED_BEEF).addOptionalTag(CommonTags.Items.FOODS_COOKED_COD).addOptionalTag(CommonTags.Items.FOODS_COOKED_MUTTON).addOptionalTag(CommonTags.Items.FOODS_COOKED_PORK);
         tag(BnCTags.Items.FOOD_HORROR_MEAT).addOptionalTag(CommonTags.Items.FOODS_RAW_BEEF).addOptionalTag(CommonTags.Items.FOODS_RAW_CHICKEN);
         tag(BnCTags.Items.FOOD_JERKY_MEAT).add(Items.ROTTEN_FLESH).addTag(Tags.Items.FOODS_RAW_MEAT);
-        copy(BnCTags.Blocks.PLAYER_WORKSTATIONS_KEGS, BnCTags.Items.PLAYER_WORKSTATIONS_KEGS);
+        tag(BnCTags.Items.PLAYER_WORKSTATIONS_KEGS).add(BnCBlocks.KEG.asItem());
         tag(BnCTags.Items.JAMS)
                 .add(BnCItems.SWEET_BERRY_JAM)
                 .add(BnCItems.GLOW_BERRY_MARMALADE)

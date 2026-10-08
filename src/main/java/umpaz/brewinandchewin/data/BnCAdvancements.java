@@ -22,8 +22,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.storage.loot.predicates.AnyOfCondition;
 import net.minecraft.world.level.storage.loot.predicates.LocationCheck;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.common.data.internal.NeoForgeAdvancementProvider;
+import net.minecraft.data.advancements.AdvancementSubProvider;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.block.entity.KegBlockEntity;
 import umpaz.brewinandchewin.common.loot.condition.AreaLocationCheckCondition;
@@ -37,7 +36,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class BnCAdvancements implements NeoForgeAdvancementProvider.AdvancementGenerator {
+public class BnCAdvancements implements AdvancementSubProvider {
     // Make sure to exclude compatibility items such as Kombucha.
     private static final Item[] DRINKS = new Item[]{
             BnCItems.BEER,
@@ -77,7 +76,7 @@ public class BnCAdvancements implements NeoForgeAdvancementProvider.AdvancementG
     }
 
     @Override
-    public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver, ExistingFileHelper existingFileHelper) {
+    public void generate(HolderLookup.Provider registries, Consumer<AdvancementHolder> saver) {
         AdvancementHolder brewinAndChewin = Advancement.Builder.advancement().
                 display(BnCItems.BEER, Component.translatable("brewinandchewin.advancement.root"), Component.translatable("brewinandchewin.advancement.root.desc"), Identifier.withDefaultNamespace("textures/block/spruce_planks.png"), AdvancementType.TASK, false, false, false).addCriterion("beer", InventoryChangeTrigger.TriggerInstance.hasItems(new ItemLike[0]))
                 .save(saver, BrewinAndChewin.asResource("main/root").toString());

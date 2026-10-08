@@ -5,7 +5,6 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.DamageTypeTagsProvider;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageTypes;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.registry.BnCDamageTypes;
 import umpaz.brewinandchewin.common.tag.BnCTags;
@@ -14,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class BnCDamageTypeTags extends DamageTypeTagsProvider
 {
-    public BnCDamageTypeTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider, ExistingFileHelper existingFileHelper) {
-        super(pOutput, pLookupProvider, BrewinAndChewin.MODID, existingFileHelper);
+    public BnCDamageTypeTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider) {
+        super(pOutput, pLookupProvider, BrewinAndChewin.MODID);
     }
 
     @Override

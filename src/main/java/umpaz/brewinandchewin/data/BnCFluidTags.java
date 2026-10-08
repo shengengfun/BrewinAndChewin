@@ -4,7 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.FluidTagsProvider;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.registry.BnCFluids;
 import umpaz.brewinandchewin.common.tag.BnCTags;
@@ -14,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class BnCFluidTags extends FluidTagsProvider {
 
-    public BnCFluidTags(PackOutput output, CompletableFuture<HolderLookup.Provider> provider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, provider, BrewinAndChewin.MODID, existingFileHelper);
+    public BnCFluidTags(PackOutput output, CompletableFuture<HolderLookup.Provider> provider) {
+        super(output, provider, BrewinAndChewin.MODID);
     }
 
     @Override
