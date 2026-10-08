@@ -73,7 +73,7 @@ public class BoozeItem extends Item {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity consumer) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             var tipsy = BrewinAndChewin.getHelper().getFoodProperties(stack, consumer).effects().stream().filter(pair -> pair.effect().getEffect() == BnCEffects.TIPSY).findFirst();
             this.affectConsumer(consumer, tipsy.map(pair -> pair.effect().getDuration()).orElse(0), tipsy.map(pair -> pair.effect().getAmplifier()).orElse(-1));
         }

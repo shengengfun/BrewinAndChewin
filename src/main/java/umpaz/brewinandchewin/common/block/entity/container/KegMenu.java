@@ -2,13 +2,15 @@ package umpaz.brewinandchewin.common.block.entity.container;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.recipebook.ServerPlaceRecipe;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import umpaz.brewinandchewin.BrewinAndChewin;
@@ -17,15 +19,26 @@ import umpaz.brewinandchewin.common.block.entity.KegBlockEntity;
 import umpaz.brewinandchewin.common.container.AbstractedFluidTank;
 import umpaz.brewinandchewin.common.container.AbstractedItemHandler;
 import umpaz.brewinandchewin.common.crafting.KegFermentingRecipe;
+import umpaz.brewinandchewin.common.crafting.KegPouringRecipe;
 import umpaz.brewinandchewin.common.registry.BnCBlocks;
 import umpaz.brewinandchewin.common.registry.BnCMenuTypes;
+import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
+import umpaz.brewinandchewin.common.utility.FluidUnit;
 import umpaz.brewinandchewin.common.utility.KegRecipeWrapper;
 
+import java.util.List;
 import java.util.Objects;
 
-public class KegMenu extends RecipeBookMenu<KegRecipeWrapper, KegFermentingRecipe>
+public class KegMenu extends RecipeBookMenu implements ServerPlaceRecipe.CraftingMenuAccess<KegFermentingRecipe>
 {
     public static final Identifier EMPTY_CONTAINER_SLOT_TANKARD = BrewinAndChewin.asResource("item/empty_container_slot_tankard");
+
+    /** The 2x2 fermenting grid occupies slots 0..3. */
+    private static final int GRID_WIDTH = 2;
+    private static final int GRID_HEIGHT = 2;
+    private static final int GRID_SLOTS = GRID_WIDTH * GRID_HEIGHT;
+    private static final int CONTAINER_SLOT = 4;
+    private static final int RESULT_SLOT = 5;
 
     public final KegBlockEntity blockEntity;
     public final AbstractedItemHandler inventory;
@@ -65,10 +78,10 @@ public class KegMenu extends RecipeBookMenu<KegRecipeWrapper, KegFermentingRecip
 
 
         // Tankard Input
-        this.addSlot(BrewinAndChewin.getHelper().createKegContainerSlot(inventory, 4, 91, 55));
+        this.addSlot(BrewinAndChewin.getHelper().createKegContainerSlot(inventory, CONTAINER_SLOT, 91, 55));
 
         // Tankard Output
-        this.addSlot(BrewinAndChewin.getHelper().createKegResultSlot(inventory, 5, 124, 55));
+        this.addSlot(BrewinAndChewin.getHelper().createKegResultSlot(inventory, RESULT_SLOT, 124, 55));
 
 
         // Main Player Inventory
@@ -105,12 +118,12 @@ public class KegMenu extends RecipeBookMenu<KegRecipeWrapper, KegFermentingRecip
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
-        int indexContainerInput = 4;
-        int indexOutput = 5;
+        int indexContainerInput = CONTAINER_SLOT;
+        int indexOutput = RESULT_SLOT;
         int startPlayerInv = indexOutput + 1;
         int endPlayerInv = startPlayerInv + 36;
 
-        Slot slot = this.slots.get(index);
+        Slot slot = this.getSlot(index);
         ItemStack slotStackCopy = ItemStack.EMPTY;
         if (slot.hasItem()) {
             ItemStack slotStack = slot.getItem();
@@ -120,7 +133,7 @@ public class KegMenu extends RecipeBookMenu<KegRecipeWrapper, KegFermentingRecip
                     return ItemStack.EMPTY;
                 }
             } else if (index > indexOutput) {
-                boolean isValidContainer = slotStack.is(blockEntity.getInventory().getStackInSlot(4).getItem()) || blockEntity.getPouringRecipe(slotStack).isPresent();
+                boolean isValidContainer = slotStack.is(blockEntity.getInventory().getStackInSlot(CONTAINER_SLOT).getItem()) || blockEntity.getPouringRecipe(slotStack).isPresent();
                 if (isValidContainer && !this.moveItemStackTo(slotStack, indexContainerInput, indexContainerInput + 1, false)) {
                     return ItemStack.EMPTY;
                 }
@@ -169,27 +182,63 @@ public class KegMenu extends RecipeBookMenu<KegRecipeWrapper, KegFermentingRecip
     }
 
     @Override
-    public void handlePlacement(boolean placeAll, RecipeHolder<?> recipe, ServerPlayer player) {
-        RecipeHolder<KegFermentingRecipe> recipeHolder = (RecipeHolder)recipe;
-        this.beginPlacingRecipe();
-
-        try {
-            new KegPlaceRecipe(this, level.getRecipeManager()).recipeClicked(player, recipeHolder, placeAll);
-        } finally {
-            this.finishPlacingRecipe(recipeHolder);
-        }
+    public RecipeBookMenu.PostPlaceAction handlePlacement(boolean useMaxItems, boolean allowDroppingItemsToClear, RecipeHolder<?> recipe, ServerLevel serverLevel, Inventory inventory) {
+        RecipeHolder<KegFermentingRecipe> recipeHolder = (RecipeHolder<KegFermentingRecipe>) recipe;
+        List<Slot> gridSlots = this.slots.subList(0, GRID_SLOTS);
+        return ServerPlaceRecipe.placeRecipe(this, GRID_WIDTH, GRID_HEIGHT, gridSlots, gridSlots, inventory, recipeHolder, useMaxItems, allowDroppingItemsToClear);
     }
 
     @Override
-    public void fillCraftSlotsStackedContents(StackedContents helper) {
+    public void fillCraftSlotsStackedContents(StackedItemContents stackedContents) {
         for (int i = 0; i < inventory.getSlotCount(); i++) {
-            helper.accountSimpleStack(inventory.getStackInSlot(i));
+            stackedContents.accountSimpleStack(inventory.getStackInSlot(i));
         }
+
+        // 26.1 has no RecipePicker to patch any more, so the keg's "the tank's fluid counts as its
+        // containers" rule is expressed the new way: account those containers as available stacks.
+        if (kegTank.isEmpty()) {
+            return;
+        }
+        AbstractedFluidStack tankFluid = kegTank.getAbstractedFluid();
+        for (KegPouringRecipe pouring : pouringRecipes()) {
+            if (!pouring.getRawFluid().fluid().isSame(tankFluid.fluid())) {
+                continue;
+            }
+            ItemStack container = pouring.getContainer();
+            if (container.isEmpty()) {
+                continue;
+            }
+            long perContainer = pouring.getUnit().convertToLoader(pouring.getRawFluid().amount());
+            if (perContainer <= 0) {
+                continue;
+            }
+            int available = (int) Math.min(tankFluid.amount() / perContainer, container.getMaxStackSize());
+            if (available > 0) {
+                stackedContents.accountStack(container.copyWithCount(available));
+            }
+        }
+    }
+
+    /**
+     * The KEG_POURING recipes, read off the server's recipe manager.
+     *
+     * <p>26.1 dropped {@code RecipeManager#getAllRecipesFor}, so this filters {@code getRecipes()}
+     * instead. The client has no recipe manager at all any more, hence the {@link ServerLevel} gate.
+     */
+    private List<KegPouringRecipe> pouringRecipes() {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return List.of();
+        }
+        return serverLevel.recipeAccess().getRecipes().stream()
+                .map(RecipeHolder::value)
+                .filter(KegPouringRecipe.class::isInstance)
+                .map(KegPouringRecipe.class::cast)
+                .toList();
     }
 
     @Override
     public void clearCraftingContent() {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < GRID_SLOTS; i++) {
             this.inventory.setStackInSlot(i, ItemStack.EMPTY);
         }
     }
@@ -199,24 +248,16 @@ public class KegMenu extends RecipeBookMenu<KegRecipeWrapper, KegFermentingRecip
         return recipe.value().matches(recipeWrapper, level);
     }
 
-    @Override
     public int getResultSlotIndex() {
-        return 5;
+        return RESULT_SLOT;
     }
 
-    @Override
     public int getGridWidth() {
-        return 2;
+        return GRID_WIDTH;
     }
 
-    @Override
     public int getGridHeight() {
-        return 2;
-    }
-
-    @Override
-    public int getSize() {
-        return 6;
+        return GRID_HEIGHT;
     }
 
     @Override
@@ -224,7 +265,6 @@ public class KegMenu extends RecipeBookMenu<KegRecipeWrapper, KegFermentingRecip
         return BnCRecipeBookTypes.FERMENTING;
     }
 
-    @Override
     public boolean shouldMoveToInventory(int slot) {
         return slot < (getGridWidth() * getGridHeight());
     }

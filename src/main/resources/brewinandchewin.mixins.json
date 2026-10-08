@@ -7,7 +7,6 @@
     "DataFixTypesAccessor",
     "DataFixTypesMixin",
     "IntoxicationCancelSaturationMixin",
-    "KegStackedContentsRecipePickerMixin",
     "LivingEntityAccessor",
     "LivingEntityMixin",
     "LootContextAccessor",
@@ -20,7 +19,6 @@
     "ServerGamePacketListenerImplMixin",
     "ServerPlaceRecipeAccessor",
     "ServerRecipeBookMixin",
-    "StackedContentsRecipePickerAccessor",
     "StoreLootParamsMixin$LootParamsBuilderMixin",
     "StoreLootParamsMixin$LootParamsMixin"
   ],

@@ -1,5 +1,6 @@
 package umpaz.brewinandchewin.common.utility;
 
+import umpaz.brewinandchewin.common.utility.BnCRecipeLookup;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -20,7 +21,7 @@ public class BnCRecipeUtils {
         MinecraftServer server = BrewinAndChewin.getHelper().getServer();
         if (server == null)
             return ItemStack.EMPTY;
-        Optional<KegPouringRecipe> recipe = server.getRecipeManager().getAllRecipesFor(BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> kegPouringRecipe.getRawFluid().matches(fluid)).findFirst();
+        Optional<KegPouringRecipe> recipe = BnCRecipeLookup.all(BnCRecipeLookup.manager(server), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> kegPouringRecipe.getRawFluid().matches(fluid)).findFirst();
         return recipe.map(KegPouringRecipe::getOutput).orElse(ItemStack.EMPTY);
     }
 }

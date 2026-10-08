@@ -1,5 +1,7 @@
 package umpaz.brewinandchewin.common.block;
 
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -73,10 +75,10 @@ public class WildGrapesBlock extends Block {
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos pos, BlockPos facingPos) {
+    public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
         return facing == state.getValue(FACING) && !this.canSurvive(state, level, pos)
                 ? Blocks.AIR.defaultBlockState()
-                : super.updateShape(state, facing, facingState, level, pos, facingPos);
+                : super.updateShape(state, level, ticks, pos, facing, facingPos, facingState, random);
     }
 
     @Override

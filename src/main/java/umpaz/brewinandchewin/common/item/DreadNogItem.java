@@ -22,7 +22,7 @@ public class DreadNogItem extends BoozeItem {
 
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity consumer) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             var badOmen = BrewinAndChewin.getHelper().getFoodProperties(stack, consumer).effects().stream().filter(pair -> pair.effect().getEffect() == MobEffects.BAD_OMEN).findFirst();
             this.affectConsumerBadOmen(consumer, badOmen.map(pair -> pair.effect().getDuration()).orElse(0), badOmen.map(pair -> pair.effect().getAmplifier()).orElse(-1));
         }

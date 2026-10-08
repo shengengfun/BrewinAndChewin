@@ -23,6 +23,7 @@
  */
 package umpaz.brewinandchewin.integration.jei.transfer;
 
+import umpaz.brewinandchewin.common.utility.BnCRecipeLookup;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.world.entity.player.Player;
@@ -352,7 +353,7 @@ public class FermentingTransferServer {
             ItemStack stack = slotStack.copy();
 
             int fluidStackAmount = 1;
-            List<KegPouringRecipe> pouringRecipes = player.level().getRecipeManager().getAllRecipesFor(BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).filter(kegPouringRecipe -> (pouringRecipeSource.left().isEmpty() || kegPouringRecipe.canFill()) && pouringRecipeSource.map(recipe -> recipe.getFluidIngredient().orElseThrow().ingredient().matches(kegPouringRecipe.getFluid(stack)), menu -> menu.kegTank.getAbstractedFluid().matches(kegPouringRecipe.getFluid(stack)))).toList();
+            List<KegPouringRecipe> pouringRecipes = BnCRecipeLookup.all(BnCRecipeLookup.manager(player.level()), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).filter(kegPouringRecipe -> (pouringRecipeSource.left().isEmpty() || kegPouringRecipe.canFill()) && pouringRecipeSource.map(recipe -> recipe.getFluidIngredient().orElseThrow().ingredient().matches(kegPouringRecipe.getFluid(stack)), menu -> menu.kegTank.getAbstractedFluid().matches(kegPouringRecipe.getFluid(stack)))).toList();
             Optional<KegPouringRecipe> optionalData = pouringRecipes.stream().filter(pouring -> {
                 if (pouring.isStrict())
                     return ItemStack.isSameItemSameComponents(stack, pouringRecipeSource.map(ignored -> pouring.getOutput(), ignored -> pouring.getContainer()));
@@ -399,7 +400,7 @@ public class FermentingTransferServer {
 
             int toExtract = stack.getCount();
             if (recipe != null && recipe.getFluidIngredient().isPresent()) {
-                List<KegPouringRecipe> pouringRecipes = level.getRecipeManager().getAllRecipesFor(BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).filter(kegPouringRecipe -> (!insert || kegPouringRecipe.canFill()) && recipe.getFluidIngredient().get().ingredient().matches(kegPouringRecipe.getFluid(stack))).toList();
+                List<KegPouringRecipe> pouringRecipes = BnCRecipeLookup.all(BnCRecipeLookup.manager(level), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).filter(kegPouringRecipe -> (!insert || kegPouringRecipe.canFill()) && recipe.getFluidIngredient().get().ingredient().matches(kegPouringRecipe.getFluid(stack))).toList();
                 Optional<KegPouringRecipe> optionalData = pouringRecipes.stream().filter(pouring -> {
                     if (pouring.isStrict())
                         return ItemStack.isSameItemSameComponents(stack, pouring.getOutput());

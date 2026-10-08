@@ -1,5 +1,6 @@
 package umpaz.brewinandchewin.client.gui;
 
+import umpaz.brewinandchewin.common.utility.BnCRecipeLookup;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -120,7 +121,7 @@ public class KegScreen extends AbstractContainerScreen<KegMenu> implements Recip
             Component containerComponent = (BnCTextUtils.getTranslation("container.keg.served_in", FLUID_CONTAINER_COMPONENTS.computeIfAbsent(menu.kegTank.getAbstractedFluid().fluid(), fluid -> {
                 MutableComponent component = MutableComponent.create(PlainTextContents.EMPTY).withStyle(ChatFormatting.GRAY);
                 int amountAdded = 0;
-                for (KegPouringRecipe recipe : Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).filter(pouringRecipe -> {
+                for (KegPouringRecipe recipe : BnCRecipeLookup.all(BnCRecipeLookup.manager(Minecraft.getInstance().level), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).filter(pouringRecipe -> {
                     if (pouringRecipe.isStrict())
                         return pouringRecipe.getRawFluid().matches(menu.kegTank.getAbstractedFluid());
                     return pouringRecipe.getRawFluid().fluid().isSame(menu.kegTank.getAbstractedFluid().fluid());
@@ -214,7 +215,7 @@ public class KegScreen extends AbstractContainerScreen<KegMenu> implements Recip
                 BrewinAndChewinClient.getHelper().renderFluidInKeg(fluidStack, gui, leftPos + 120, topPos + 19, 1.0F);
 
             ItemStack itemDisplay = BnCFluidItemDisplays.getFluidItemDisplay(Minecraft.getInstance().level.registryAccess(), fluidStack).copy();
-            Optional<KegPouringRecipe> pouringRecipe = Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> {
+            Optional<KegPouringRecipe> pouringRecipe = BnCRecipeLookup.all(BnCRecipeLookup.manager(Minecraft.getInstance().level), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> {
                 if (kegPouringRecipe.isStrict())
                     return ItemStack.isSameItemSameComponents(itemDisplay, kegPouringRecipe.getResultItem(minecraft.level.registryAccess()));
                 return ItemStack.isSameItem(itemDisplay, kegPouringRecipe.getResultItem(minecraft.level.registryAccess()));

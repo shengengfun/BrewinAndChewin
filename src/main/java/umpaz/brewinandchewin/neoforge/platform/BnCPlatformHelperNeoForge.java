@@ -50,7 +50,6 @@ import umpaz.brewinandchewin.common.container.AbstractedFluidTank;
 import umpaz.brewinandchewin.common.container.AbstractedItemHandler;
 import umpaz.brewinandchewin.common.block.entity.container.AgingCaskMenu;
 import umpaz.brewinandchewin.common.block.entity.container.KegMenu;
-import umpaz.brewinandchewin.common.block.entity.container.KegStackedContents;
 import umpaz.brewinandchewin.common.block.entity.container.SidedKegWrapper;
 import umpaz.brewinandchewin.common.utility.*;
 import umpaz.brewinandchewin.neoforge.container.KegFluidItemStorageNeoForge;
@@ -87,14 +86,14 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
 
     @Override
     public void sendClientbound(ServerPlayer player, CustomPacketPayload payload) {
-        if (player.level().isClientSide)
+        if (player.level().isClientSide())
             return;
         PacketDistributor.sendToPlayer(player, payload);
     }
 
     @Override
     public void sendClientboundTracking(Entity tracked, CustomPacketPayload payload) {
-        if (tracked.level().isClientSide)
+        if (tracked.level().isClientSide())
             return;
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(tracked, payload);
     }
@@ -155,15 +154,6 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
                 return noItemIcon;
             }
         };
-    }
-
-    @Override
-    public Ingredient createStrictFillPickerIngredient(List<KegStackedContents.PouringEntry> fluidOutputStacks) {
-        return CompoundIngredient.of(fluidOutputStacks.stream().map(p -> {
-            if (p.strict())
-                return DataComponentIngredient.of(true, p.stack());
-            return Ingredient.of(p.stack().getItem());
-        }).toArray(Ingredient[]::new));
     }
 
     @Override

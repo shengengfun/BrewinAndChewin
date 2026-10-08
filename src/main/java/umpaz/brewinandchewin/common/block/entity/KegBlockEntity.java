@@ -1,5 +1,6 @@
 package umpaz.brewinandchewin.common.block.entity;
 
+import umpaz.brewinandchewin.common.utility.BnCRecipeLookup;
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -309,7 +310,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         if (level == null) return Optional.empty();
 
         if (checkNewRecipe) {
-            Optional<RecipeHolder<KegFermentingRecipe>> recipe = level.getRecipeManager().getAllRecipesFor(BnCRecipeTypes.FERMENTING).stream().filter(a -> a.value().matches(inventoryWrapper, level)).findFirst();
+            Optional<RecipeHolder<KegFermentingRecipe>> recipe = BnCRecipeLookup.all(BnCRecipeLookup.manager(level), BnCRecipeTypes.FERMENTING).stream().filter(a -> a.value().matches(inventoryWrapper, level)).findFirst();
             if (recipe.isPresent()) {
                 Identifier newRecipeID = recipe.get().id();
                 if (lastRecipeID != null && !lastRecipeID.equals(newRecipeID)) {
@@ -522,7 +523,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         if (itemFluidContainer != null && !slotIn.isEmpty()) {
             if ((fluidTank.getAbstractedFluid().matches(itemFluidContainer.getAbstractedFluid()) || fluidTank.getAbstractedFluid().isEmpty()) &&
                     (!inGui || inventory.getStackInSlot(OUTPUT_SLOT).isEmpty() || inventory.getStackInSlot(OUTPUT_SLOT).is(itemFluidContainer.getContainer().getItem())) &&
-                    level.getRecipeManager().getAllRecipesFor(BnCRecipeTypes.KEG_POURING).stream().anyMatch(pouringRecipe -> pouringRecipe.value().getFluid(slotIn).matches(fluidTank.getAbstractedFluid()))) {
+                    BnCRecipeLookup.all(BnCRecipeLookup.manager(level), BnCRecipeTypes.KEG_POURING).stream().anyMatch(pouringRecipe -> pouringRecipe.value().getFluid(slotIn).matches(fluidTank.getAbstractedFluid()))) {
                 long amountToDrain = fluidTank.getFluidCapacity() - fluidTank.getAbstractedFluid().amount();
                 long amount = fluidTank.fill(itemFluidContainer.drain(amountToDrain, FluidUnit.getLoaderUnit(), true), true).amount();
                 if (amount <= amountToDrain && amount > 0) {
@@ -567,7 +568,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
 
     public Optional<KegPouringRecipe> getPouringRecipe(ItemStack slot) {
         if (level == null) return Optional.empty();
-        return level.getRecipeManager().getAllRecipesFor(BnCRecipeTypes.KEG_POURING)
+        return BnCRecipeLookup.all(BnCRecipeLookup.manager(level), BnCRecipeTypes.KEG_POURING)
                 .stream()
                 .map(RecipeHolder::value)
                 .sorted(Comparator.comparingInt(value -> value.isStrict() ? 0 : 1))
