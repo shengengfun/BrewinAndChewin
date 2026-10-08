@@ -1,5 +1,8 @@
 package umpaz.brewinandchewin.common.utility;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.Recipe;
@@ -10,6 +13,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Recipe lookups for 26.1.
@@ -33,10 +37,30 @@ public final class BnCRecipeLookup {
 
     /** Every recipe of the given type. Replaces the removed {@code getAllRecipesFor}. */
     @SuppressWarnings("unchecked")
-    public static <T extends Recipe<?>> List<RecipeHolder<T>> all(RecipeManager manager, RecipeType<T> type) {
+    public static <T extends Recipe<?>> List<RecipeHolder<T>> all(@Nullable RecipeManager manager, RecipeType<T> type) {
+        if (manager == null) {
+            return List.of();
+        }
         return manager.getRecipes().stream()
                 .filter(holder -> holder.value().getType() == type)
                 .map(holder -> (RecipeHolder<T>) holder)
                 .toList();
+    }
+
+    /** A single recipe by id. Replaces the removed by-id {@code getRecipeFor} overload. */
+    public static Optional<RecipeHolder<?>> byKey(Level level, Identifier id) {
+        RecipeManager manager = manager(level);
+        if (manager == null) {
+            return Optional.empty();
+        }
+        return manager.byKey(ResourceKey.create(Registries.RECIPE, id));
+    }
+
+    /** A single recipe by id, narrowed to the expected type. */
+    @SuppressWarnings("unchecked")
+    public static <T extends Recipe<?>> Optional<RecipeHolder<T>> byKey(Level level, Identifier id, RecipeType<T> type) {
+        return byKey(level, id)
+                .filter(holder -> holder.value().getType() == type)
+                .map(holder -> (RecipeHolder<T>) holder);
     }
 }

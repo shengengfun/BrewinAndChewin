@@ -279,27 +279,27 @@ public class AgingCaskBlockEntity extends BaseContainerBlockEntity implements Wo
         return slot >= FIRST_DISTILLATE_SLOT && slot < OUTPUT_SLOT && !isDistillateSlotUnlocked(this.getWine(), slot);
     }
 
+    // 26.1: block entities read/write ValueInput/ValueOutput, and ContainerHelper no longer
+    // takes a registry provider.
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         this.inventory = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
-        ContainerHelper.loadAllItems(nbt, this.inventory, provider);
-        this.agingTime = nbt.getInt("AgingTime");
+        ContainerHelper.loadAllItems(input, this.inventory);
+        this.agingTime = input.getIntOr("AgingTime", 0);
         this.snapshotInputs();
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.saveAdditional(nbt, provider);
-        ContainerHelper.saveAllItems(nbt, this.inventory, provider);
-        nbt.putInt("AgingTime", this.agingTime);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, this.inventory);
+        output.putInt("AgingTime", this.agingTime);
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-        CompoundTag tag = new CompoundTag();
-        this.saveAdditional(tag, provider);
-        return tag;
+        return saveWithoutMetadata(provider);
     }
 
     @Nullable

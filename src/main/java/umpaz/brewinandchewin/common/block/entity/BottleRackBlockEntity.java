@@ -46,15 +46,15 @@ public class BottleRackBlockEntity extends SyncedBlockEntity implements Clearabl
     }
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         this.inventory.clear();
-        ContainerHelper.loadAllItems(nbt, this.inventory, provider);
+        ContainerHelper.loadAllItems(input, this.inventory);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.saveAdditional(nbt, provider);
-        ContainerHelper.saveAllItems(nbt, this.inventory, provider);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, this.inventory);
     }
 }

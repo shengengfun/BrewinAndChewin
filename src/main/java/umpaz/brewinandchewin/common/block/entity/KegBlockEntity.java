@@ -11,8 +11,14 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -107,24 +113,26 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         this.recipeWrapper = BrewinAndChewin.getHelper().createRecipeWrapper(inventory, fluidTank);
     }
 
+    // 26.1 block entities read/write through ValueInput/ValueOutput instead of a raw CompoundTag,
+    // and CompoundTag's accessors return Optionals. The stored keys are unchanged.
     @Override
-    public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-        super.loadAdditional(compound, provider);
-        inventory.readFromNbt(compound.getCompound("Inventory"), provider);
-        fluidTank.readFromNbt(compound.getCompound("FluidTank"), provider);
-        fermentTime = compound.getInt("FermentTime");
-        fermentTimeTotal = compound.getInt("FermentTimeTotal");
-        fermentFluid = compound.contains("FermentFluid", Tag.TAG_LONG) ? compound.getLong("FermentFluid") : -1L;
-        fermentBatches = Math.max(1, compound.getInt("FermentBatches"));
-        if (compound.contains("CustomName", 8)) {
-            customName = Component.Serializer.fromJson(compound.getString("CustomName"), provider);
-        }
-        CompoundTag compoundRecipes = compound.getCompound("RecipesUsed");
-        for (String key : compoundRecipes.getAllKeys()) {
-            usedRecipeTracker.put(Identifier.tryParse(key), compoundRecipes.getInt(key));
-        }
-        if (compound.contains("Temperature", Tag.TAG_INT))
-            kegTemperature = compound.getInt("Temperature");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.read("Inventory", CompoundTag.CODEC).ifPresent(tag -> inventory.readFromNbt(tag, input.lookup()));
+        input.read("FluidTank", CompoundTag.CODEC).ifPresent(tag -> fluidTank.readFromNbt(tag, input.lookup()));
+        fermentTime = input.getIntOr("FermentTime", 0);
+        fermentTimeTotal = input.getIntOr("FermentTimeTotal", 0);
+        fermentFluid = input.getLongOr("FermentFluid", -1L);
+        fermentBatches = Math.max(1, input.getIntOr("FermentBatches", 1));
+        input.read("CustomName", ComponentSerialization.CODEC).ifPresent(name -> customName = name);
+        input.read("RecipesUsed", CompoundTag.CODEC).ifPresent(recipes -> {
+            for (String key : recipes.keySet()) {
+                Identifier recipeId = Identifier.tryParse(key);
+                if (recipeId != null)
+                    usedRecipeTracker.put(recipeId, recipes.getIntOr(key, 0));
+            }
+        });
+        kegTemperature = input.getIntOr("Temperature", kegTemperature);
         checkNewRecipe = true;
     }
 
@@ -133,12 +141,14 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
             return AbstractedFluidStack.EMPTY;
         }
 
-        CustomData data = kegStack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
-        CompoundTag tag = data.copyTag();
-        if (!tag.isEmpty()) {
-            if (tag.contains("FluidTank", Tag.TAG_COMPOUND)) {
-                return BrewinAndChewin.getHelper().deserializeTankFluidStack(tag.getCompound("FluidTank"), provider);
-            }
+        // BLOCK_ENTITY_DATA is TypedEntityData now, not CustomData.
+        TypedEntityData<BlockEntityType<?>> data = kegStack.get(DataComponents.BLOCK_ENTITY_DATA);
+        if (data == null) {
+            return AbstractedFluidStack.EMPTY;
+        }
+        CompoundTag tag = data.copyTagWithoutId();
+        if (tag.getCompound("FluidTank").isPresent()) {
+            return BrewinAndChewin.getHelper().deserializeTankFluidStack(tag.getCompoundOrEmpty("FluidTank"), provider);
         }
 
         return AbstractedFluidStack.EMPTY;
@@ -161,30 +171,22 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
 
 
     @Override
-    public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
-        super.saveAdditional(compound, provider);
-        compound.put("Inventory", inventory.writeToNbt(provider));
-        compound.put("FluidTank", fluidTank.writeToNbt(provider));
-        compound.putInt("FermentTime", fermentTime);
-        compound.putInt("FermentTimeTotal", fermentTimeTotal);
-        compound.putLong("FermentFluid", fermentFluid);
-        compound.putInt("FermentBatches", fermentBatches);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        // ValueOutput carries no registry lookup (unlike ValueInput), so take it off the level.
+        HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
+        output.store("Inventory", CompoundTag.CODEC, inventory.writeToNbt(registries));
+        output.store("FluidTank", CompoundTag.CODEC, fluidTank.writeToNbt(registries));
+        output.putInt("FermentTime", fermentTime);
+        output.putInt("FermentTimeTotal", fermentTimeTotal);
+        output.putLong("FermentFluid", fermentFluid);
+        output.putInt("FermentBatches", fermentBatches);
         if (customName != null) {
-            compound.putString("CustomName", Component.Serializer.toJson(customName, provider));
+            output.store("CustomName", ComponentSerialization.CODEC, customName);
         }
         CompoundTag compoundRecipes = new CompoundTag();
         usedRecipeTracker.forEach((recipeId, craftedAmount) -> compoundRecipes.putInt(recipeId.toString(), craftedAmount));
-        compound.put("RecipesUsed", compoundRecipes);
-    }
-
-    private CompoundTag writeUpdateTag(CompoundTag compound, HolderLookup.Provider provider) {
-        super.saveAdditional(compound, provider);
-        compound.put("Inventory", inventory.writeToNbt(provider));
-        compound.put("FluidTank", fluidTank.writeToNbt(provider));
-        compound.putInt("FermentTime", fermentTime);
-        compound.putInt("FermentTimeTotal", fermentTimeTotal);
-        compound.putInt("Temperature", kegTemperature);
-        return compound;
+        output.store("RecipesUsed", CompoundTag.CODEC, compoundRecipes);
     }
 
     @Override
@@ -195,7 +197,9 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
     public CompoundTag writeDrink(CompoundTag compound, HolderLookup.Provider provider) {
         compound.putString("id", BnCBlockEntityTypes.KEG.builtInRegistryHolder().getRegisteredName());
         if (customName != null) {
-            compound.putString("CustomName", Component.Serializer.toJson(customName, provider));
+            // Stored through the same codec loadAdditional reads, so the name survives an
+            // item -> block round trip.
+            compound.put("CustomName", ComponentSerialization.CODEC.encodeStart(NbtOps.INSTANCE, customName).getOrThrow());
         }
         if (!fluidTank.isEmpty()) {
             compound.put("FluidTank", this.fluidTank.writeToNbt(provider));
@@ -312,7 +316,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         if (checkNewRecipe) {
             Optional<RecipeHolder<KegFermentingRecipe>> recipe = BnCRecipeLookup.all(BnCRecipeLookup.manager(level), BnCRecipeTypes.FERMENTING).stream().filter(a -> a.value().matches(inventoryWrapper, level)).findFirst();
             if (recipe.isPresent()) {
-                Identifier newRecipeID = recipe.get().id();
+                Identifier newRecipeID = recipe.get().id().identifier();
                 if (lastRecipeID != null && !lastRecipeID.equals(newRecipeID)) {
                     fermentTime = 0;
                 }
@@ -323,8 +327,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         checkNewRecipe = false;
 
         if (lastRecipeID != null) {
-            Optional<RecipeHolder<KegFermentingRecipe>> recipe = level.getRecipeManager()
-                    .getRecipeFor(BnCRecipeTypes.FERMENTING, inventoryWrapper, level, lastRecipeID);
+            Optional<RecipeHolder<KegFermentingRecipe>> recipe = BnCRecipeLookup.byKey(level, lastRecipeID, BnCRecipeTypes.FERMENTING);
             if (recipe.isPresent() && recipe.get().value().matches(inventoryWrapper, level)) {
                 return recipe;
             }
@@ -462,7 +465,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         currentlyOperating = true;
 
         if (recipe.isPresent() && (fluidTank.isEmpty() || fluidTank.getAbstractedFluid().fluid() == recipe.get().getRawFluid().fluid())) { // if the recipe is present and the fluid is empty or the same
-            ItemStack resultItem = recipe.get().assemble(recipeWrapper, level.registryAccess());
+            ItemStack resultItem = recipe.get().assemble(recipeWrapper);
             if (ItemStack.isSameItem(slotIn, recipe.get().getContainer(resultItem)) && // if container is same
                     recipe.get().getRawFluid().amount() <= fluidTank.getAbstractedFluid().amount() && // the amount is LTE the fluid amount
                     (!inGui || inventory.getStackInSlot(OUTPUT_SLOT).isEmpty() || ItemStack.isSameItemSameComponents(resultItem, inventory.getStackInSlot(OUTPUT_SLOT)))) { // the output slot can accept this itemaccept this item
@@ -623,7 +626,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
 
         int temp = heat - cold;
 
-        if (BnCConfiguration.common().keg().dimTemp() && level.dimensionType().ultraWarm())
+        if (BnCConfiguration.common().keg().dimTemp() && level.dimensionType().hasCeiling())
             temp += 2;
 
         if (!initialisedTemperature || temp != kegTemperature) {
@@ -659,7 +662,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
     @Override
     public void setRecipeUsed(@Nullable RecipeHolder<?> recipe) {
         if (recipe != null) {
-            Identifier recipeID = recipe.id();
+            Identifier recipeID = recipe.id().identifier();
             usedRecipeTracker.addTo(recipeID, 1);
         }
     }
@@ -681,7 +684,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         List<RecipeHolder<?>> list = Lists.newArrayList();
 
         for (Object2IntMap.Entry<Identifier> entry : usedRecipeTracker.object2IntEntrySet()) {
-            level.getRecipeManager().byKey(entry.getKey()).ifPresent((recipe) -> {
+            BnCRecipeLookup.byKey(level, entry.getKey()).ifPresent((recipe) -> {
                 list.add(recipe);
                 splitAndSpawnExperience((ServerLevel) level, pos, entry.getIntValue(), ((KegFermentingRecipe)recipe.value()).getExperience());
             });
@@ -760,7 +763,9 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
-        return writeUpdateTag(new CompoundTag(), provider);
+        CompoundTag tag = saveWithoutMetadata(provider);
+        tag.putInt("Temperature", kegTemperature);
+        return tag;
     }
 
     private AbstractedItemHandler createHandler() {

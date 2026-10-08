@@ -93,16 +93,16 @@ public class CoasterBlockEntity extends SyncedBlockEntity implements Clearable {
     }
 
    @Override
-   public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-       super.loadAdditional(nbt, provider);
+   protected void loadAdditional(ValueInput input) {
+       super.loadAdditional(input);
        inventory.clear();
-       ContainerHelper.loadAllItems(nbt, inventory, provider);
+       ContainerHelper.loadAllItems(input, inventory);
    }
 
    @Override
-   protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-       super.saveAdditional(nbt, provider);
-       ContainerHelper.saveAllItems(nbt, inventory, provider);
+   protected void saveAdditional(ValueOutput output) {
+       super.saveAdditional(output);
+       ContainerHelper.saveAllItems(output, inventory);
    }
 
    // Implement through method override in renderer.
