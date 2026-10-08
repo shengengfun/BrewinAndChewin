@@ -86,7 +86,7 @@ public class TrellisBlock extends Block implements SimpleWaterloggedBlock {
     @Override
     public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         if (state.getValue(WATERLOGGED))
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         if (direction.getAxis().isVertical())
             return state.setValue(PART, getPart(level, pos, state.getValue(AXIS)));
         return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);

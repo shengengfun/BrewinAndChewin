@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.ItemNameBlockItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -14,11 +14,11 @@ import umpaz.brewinandchewin.common.block.GrapeColour;
 import umpaz.brewinandchewin.common.block.TrellisBlock;
 import umpaz.brewinandchewin.common.block.TrellisGrapeBlock;
 
-public class GrapeSeedsItem extends ItemNameBlockItem {
+public class GrapeSeedsItem extends BlockItem {
     private final GrapeColour colour;
 
     public GrapeSeedsItem(Block bush, GrapeColour colour, Properties properties) {
-        super(bush, properties);
+        super(bush, properties.useBlockDescriptionPrefix());
         this.colour = colour;
     }
 

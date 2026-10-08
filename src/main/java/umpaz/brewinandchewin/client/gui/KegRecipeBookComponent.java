@@ -209,7 +209,7 @@ public class KegRecipeBookComponent extends RecipeBookComponent {
 
     @Override
     public void setupGhostRecipe(RecipeHolder<?> recipe, List<Slot> slots) {
-        ItemStack resultStack = recipe.value().getResultItem(this.minecraft.level.registryAccess()).copy();
+        ItemStack resultStack = recipe.value().getResultItem().copy();
         this.ghostRecipe.setRecipe(recipe);
         if (slots.get(5).getItem().isEmpty()) {
             this.ghostRecipe.addIngredient(Ingredient.of(resultStack), slots.get(5).x, slots.get(5).y);

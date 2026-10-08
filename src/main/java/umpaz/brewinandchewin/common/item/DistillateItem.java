@@ -81,7 +81,7 @@ public class DistillateItem extends Item implements Distillate {
 
     @Override
     public SoundEvent getEatingSound() {
-        return SoundEvents.GENERIC_DRINK;
+        return SoundEvents.GENERIC_DRINK.value();
     }
 
     @Override

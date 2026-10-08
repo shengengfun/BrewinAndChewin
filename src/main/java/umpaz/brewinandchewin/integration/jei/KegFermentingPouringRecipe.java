@@ -31,7 +31,7 @@ public class KegFermentingPouringRecipe extends KegFermentingRecipe {
 
         if (pouringRecipe != null) {
             this.catalyst = pouringRecipe.getContainer();
-            this.catalystAmount = pouringRecipe.getResultItem(provider).getCount();
+            this.catalystAmount = pouringRecipe.getResultItem().getCount();
             this.pouringAmount = pouringRecipe.getRawFluid().amount();
             this.pouringUnit = pouringRecipe.getUnit();
         } else {

@@ -5,13 +5,14 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.Level;
 import umpaz.brewinandchewin.client.recipebook.FermentingBookCategory;
 import umpaz.brewinandchewin.common.BnCConfiguration;
 import umpaz.brewinandchewin.common.registry.BnCItems;
+import umpaz.brewinandchewin.common.registry.BnCRecipeBookCategories;
 import umpaz.brewinandchewin.common.registry.BnCRecipeSerializers;
 import umpaz.brewinandchewin.common.registry.BnCRecipeTypes;
 import umpaz.brewinandchewin.common.utility.BnCRecipeUtils;
@@ -67,7 +69,6 @@ public class KegFermentingRecipe implements Recipe<KegRecipeWrapper> {
         return this.tab;
     }
 
-    @Override
     public NonNullList<Ingredient> getIngredients() {
         return this.inputItems;
     }
@@ -119,7 +120,7 @@ public class KegFermentingRecipe implements Recipe<KegRecipeWrapper> {
     }
 
     @Override
-    public ItemStack assemble(KegRecipeWrapper inv, HolderLookup.Provider access) {
+    public ItemStack assemble(KegRecipeWrapper inv) {
         return ItemStack.EMPTY;
     }
 
@@ -170,13 +171,7 @@ public class KegFermentingRecipe implements Recipe<KegRecipeWrapper> {
                 (fluidIngredient.isEmpty() && inv.getFluid().isEmpty() || fluidIngredient.isPresent() && !inv.getFluid().isEmpty() && fluidIngredient.get().ingredient().matches(inv.getFluid()) && fluidFits(inv.getFluid()));
     }
 
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= this.inputItems.size();
-    }
-
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider registryAccess) {
+    public ItemStack getResultItem() {
         if (result.right().isPresent())
             return result.right().get().copy();
         if (result.left().isPresent())
@@ -184,25 +179,47 @@ public class KegFermentingRecipe implements Recipe<KegRecipeWrapper> {
         return ItemStack.EMPTY;
     }
 
+    // 26.1 recipe surface: getIngredients()/getResultItem() are no longer part of Recipe, and
+    // placementInfo() + recipeBookCategory() are.
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public PlacementInfo placementInfo() {
+        List<Optional<Ingredient>> slots = new ArrayList<>(INPUT_SLOTS);
+        for (Ingredient ingredient : this.inputItems) {
+            slots.add(Optional.of(ingredient));
+        }
+        while (slots.size() < INPUT_SLOTS) {
+            slots.add(Optional.empty());
+        }
+        return PlacementInfo.createFromOptionals(slots);
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return switch (this.tab) {
+            case MEALS -> BnCRecipeBookCategories.FERMENTING_MEALS;
+            case DRINKS -> BnCRecipeBookCategories.FERMENTING_DRINKS;
+            case MISC -> BnCRecipeBookCategories.FERMENTING_MISC;
+        };
+    }
+
+    @Override
+    public boolean showNotification() {
+        return true;
+    }
+
+    @Override
+    public String group() {
+        return "";
+    }
+
+    @Override
+    public RecipeSerializer<? extends Recipe<KegRecipeWrapper>> getSerializer() {
         return BnCRecipeSerializers.FERMENTING;
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<? extends Recipe<KegRecipeWrapper>> getType() {
         return BnCRecipeTypes.FERMENTING;
-    }
-
-    @Override
-    public ItemStack getToastSymbol() {
-        return new ItemStack(BnCItems.KEG);
-    }
-
-    @Override
-    public boolean isIncomplete() {
-        NonNullList<Ingredient> nonnulllist = getIngredients();
-        return nonnulllist.isEmpty() || nonnulllist.stream().allMatch(Ingredient::isEmpty);
     }
 
     @Override

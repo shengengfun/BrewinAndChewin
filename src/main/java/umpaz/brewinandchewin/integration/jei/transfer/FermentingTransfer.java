@@ -309,7 +309,7 @@ public class FermentingTransfer {
                                             }
                                         }))
                                         .computeIfAbsent(slotTuple.getValue(), it -> new ArrayList<>())
-                                        .add(new SlotReference(slotTuple.getKey(), optionalData.get().getResultItem(Minecraft.getInstance().level.registryAccess()).copyWithCount(shrinkAmount), optionalData.get().getRawFluid().amount() * shrinkAmount, shrinkAmount));
+                                        .add(new SlotReference(slotTuple.getKey(), optionalData.get().getResultItem().copyWithCount(shrinkAmount), optionalData.get().getRawFluid().amount() * shrinkAmount, shrinkAmount));
                             }
                         }
                     }

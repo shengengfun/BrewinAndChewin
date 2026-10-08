@@ -128,7 +128,6 @@ public interface BnCPlatformHelper {
     Fluid getMilkFluid();
     Fluid getFlowingMilkFluid();
 
-    Fluid getCreatePotionFluid();
 
     boolean hasFoodEffectTooltip();
 }

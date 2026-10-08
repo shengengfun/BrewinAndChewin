@@ -125,8 +125,8 @@ public class FermentingRecipeCategory implements IRecipeCategory<KegFermentingPo
                 ItemStack itemDisplay = BnCFluidItemDisplays.getFluidItemDisplay(Minecraft.getInstance().level.registryAccess(), stack).copy();
                 Optional<KegPouringRecipe> pouringRecipe = BnCRecipeLookup.all(BnCRecipeLookup.manager(Minecraft.getInstance().level), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> {
                     if (kegPouringRecipe.isStrict())
-                        return ItemStack.isSameItemSameComponents(itemDisplay, kegPouringRecipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
-                    return ItemStack.isSameItem(itemDisplay, kegPouringRecipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
+                        return ItemStack.isSameItemSameComponents(itemDisplay, kegPouringRecipe.getResultItem());
+                    return ItemStack.isSameItem(itemDisplay, kegPouringRecipe.getResultItem());
                 }).findFirst();
                 int pourCount = pouringRecipe.map(kegPouringRecipe -> (int)(Math.min(KegBlockEntity.localizedCapacity(), recipe.getFluidIngredient().get().loaderAmount()) / kegPouringRecipe.getLoaderAmount())).orElse(1);
                 itemDisplay.setCount(pourCount);
@@ -163,8 +163,8 @@ public class FermentingRecipeCategory implements IRecipeCategory<KegFermentingPo
             ItemStack itemDisplay = BnCFluidItemDisplays.getFluidItemDisplay(Minecraft.getInstance().level.registryAccess(), result).copy();
             Optional<KegPouringRecipe> pouringRecipe = BnCRecipeLookup.all(BnCRecipeLookup.manager(Minecraft.getInstance().level), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> {
                 if (kegPouringRecipe.isStrict())
-                    return ItemStack.isSameItemSameComponents(itemDisplay, kegPouringRecipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
-                return ItemStack.isSameItem(itemDisplay, kegPouringRecipe.getResultItem(Minecraft.getInstance().level.registryAccess()));
+                    return ItemStack.isSameItemSameComponents(itemDisplay, kegPouringRecipe.getResultItem());
+                return ItemStack.isSameItem(itemDisplay, kegPouringRecipe.getResultItem());
             }).findFirst();
             int pourCount = pouringRecipe.map(kegPouringRecipe -> (int)(Math.min(KegBlockEntity.localizedCapacity(), recipe.getFluidIngredient().get().loaderAmount()) / kegPouringRecipe.getLoaderAmount())).orElse(1);
             itemDisplay.setCount(pourCount);

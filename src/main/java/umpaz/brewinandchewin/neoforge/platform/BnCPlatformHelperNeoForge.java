@@ -308,14 +308,6 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
     }
 
     @Override
-    public Fluid getCreatePotionFluid() {
-        if (isModLoaded("create")) {
-            return BnCCreateDelegate.getPotionSource();
-        }
-        return null;
-    }
-
-    @Override
     public boolean hasFoodEffectTooltip() {
         return Configuration.ENABLE_FOOD_EFFECT_TOOLTIP.get();
     }

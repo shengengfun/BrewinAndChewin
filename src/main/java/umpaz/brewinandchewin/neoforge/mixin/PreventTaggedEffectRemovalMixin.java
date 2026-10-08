@@ -17,7 +17,7 @@ public class PreventTaggedEffectRemovalMixin {
     public static class MilkBottle {
         @ModifyExpressionValue(method = "affectConsumer", at = @At(value = "INVOKE", target = "Ljava/util/Set;contains(Ljava/lang/Object;)Z"), remap = false)
         private boolean brewinandchewin$preventIntoxicationRemoval(boolean original, @Local(argsOnly = true) Level level, @Local(argsOnly = true) LivingEntity consumer, @Local MobEffectInstance effectInstance) {
-            return original || BuiltInRegistries.MOB_EFFECT.getOrCreateTag(BnCTags.Effects.MILK_BOTTLE_LOW_PRIORITY).contains(effectInstance.getEffect()) && consumer.getActiveEffects().stream().anyMatch(effect -> !BuiltInRegistries.MOB_EFFECT.getOrCreateTag(BnCTags.Effects.MILK_BOTTLE_LOW_PRIORITY).contains(effect.getEffect()));
+            return original || BuiltInRegistries.MOB_EFFECT.getOrThrow(BnCTags.Effects.MILK_BOTTLE_LOW_PRIORITY).contains(effectInstance.getEffect()) && consumer.getActiveEffects().stream().anyMatch(effect -> !BuiltInRegistries.MOB_EFFECT.getOrThrow(BnCTags.Effects.MILK_BOTTLE_LOW_PRIORITY).contains(effect.getEffect()));
         }
     }
 
@@ -25,7 +25,7 @@ public class PreventTaggedEffectRemovalMixin {
     public static class HotCocoa {
         @ModifyExpressionValue(method = "affectConsumer", at = @At(value = "INVOKE", target = "Ljava/util/Set;contains(Ljava/lang/Object;)Z"), remap = false)
         private boolean brewinandchewin$preventIntoxicationRemoval(boolean original, @Local(argsOnly = true) Level level, @Local(argsOnly = true) LivingEntity consumer, @Local MobEffectInstance effectInstance) {
-            return original || BuiltInRegistries.MOB_EFFECT.getOrCreateTag(BnCTags.Effects.HOT_COCOA_LOW_PRIORITY).contains(effectInstance.getEffect()) && consumer.getActiveEffects().stream().anyMatch(effect -> !BuiltInRegistries.MOB_EFFECT.getOrCreateTag(BnCTags.Effects.HOT_COCOA_LOW_PRIORITY).contains(effect.getEffect()));
+            return original || BuiltInRegistries.MOB_EFFECT.getOrThrow(BnCTags.Effects.HOT_COCOA_LOW_PRIORITY).contains(effectInstance.getEffect()) && consumer.getActiveEffects().stream().anyMatch(effect -> !BuiltInRegistries.MOB_EFFECT.getOrThrow(BnCTags.Effects.HOT_COCOA_LOW_PRIORITY).contains(effect.getEffect()));
         }
     }
 }

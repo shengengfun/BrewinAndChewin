@@ -3,16 +3,17 @@ package umpaz.brewinandchewin.common.crafting;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.level.Level;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.registry.BnCItems;
+import umpaz.brewinandchewin.common.registry.BnCRecipeBookCategories;
 import umpaz.brewinandchewin.common.registry.BnCRecipeSerializers;
 import umpaz.brewinandchewin.common.registry.BnCRecipeTypes;
 import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
@@ -41,7 +42,6 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
         this.filling = filling;
     }
 
-    @Override
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> ingredient = NonNullList.create();
         ingredient.add(Ingredient.of(getContainer()));
@@ -54,13 +54,8 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
     }
 
     @Override
-    public ItemStack assemble(KegRecipeWrapper recipeWrapper, HolderLookup.Provider provider) {
+    public ItemStack assemble(KegRecipeWrapper recipeWrapper) {
         return this.output.copy();
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int pWidth, int pHeight) {
-        return true;
     }
 
     public ItemStack getContainer() {
@@ -91,8 +86,7 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
         return this.output;
     }
 
-    @Override
-    public ItemStack getResultItem(HolderLookup.Provider provider) {
+    public ItemStack getResultItem() {
         return this.output;
     }
 
@@ -116,19 +110,36 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
         return filling;
     }
 
+    // 26.1 recipe surface (see KegFermentingRecipe). Pouring is special: the tankard goes into the
+    // container slot, so there is nothing to place on the grid.
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return BnCRecipeBookCategories.FERMENTING_MISC;
+    }
+
+    @Override
+    public boolean showNotification() {
+        return false;
+    }
+
+    @Override
+    public String group() {
+        return "";
+    }
+
+    @Override
+    public RecipeSerializer<? extends Recipe<KegRecipeWrapper>> getSerializer() {
         return BnCRecipeSerializers.KEG_POURING;
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<? extends Recipe<KegRecipeWrapper>> getType() {
         return BnCRecipeTypes.KEG_POURING;
-    }
-
-    @Override
-    public ItemStack getToastSymbol() {
-        return new ItemStack(BnCItems.KEG);
     }
 
     @Override

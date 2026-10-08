@@ -16,10 +16,10 @@ public class JamJarItem extends ConsumableItem {
     }
 
     public SoundEvent getDrinkingSound() {
-        return SoundEvents.HONEY_DRINK;
+        return SoundEvents.HONEY_DRINK.value();
     }
 
     public SoundEvent getEatingSound() {
-        return SoundEvents.HONEY_DRINK;
+        return SoundEvents.HONEY_DRINK.value();
     }
 }

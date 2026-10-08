@@ -18,8 +18,6 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.network.clientbound.*;
-import umpaz.brewinandchewin.common.network.serverbound.EMIFillFermentingRecipeServerboundPacket;
-import umpaz.brewinandchewin.common.network.serverbound.EMIFillPouringRecipeServerboundPacket;
 import umpaz.brewinandchewin.common.network.serverbound.JEITransferKegRecipeServerboundPacket;
 import umpaz.brewinandchewin.common.network.serverbound.SetLabelContentsServerboundPacket;
 import umpaz.brewinandchewin.common.registry.*;
@@ -45,9 +43,12 @@ public class BrewinAndChewinNeoForge {
         container.registerConfig(ModConfig.Type.COMMON, BnCConfiguration.COMMON_SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, BnCConfiguration.CLIENT_SPEC);
         NeoForgeMod.enableMilkFluid();
+
+        // 26.1 dropped EventBusSubscriber.Bus, so the mod bus is no longer selectable from the
+        // annotation - register those listeners on the mod's own event bus instead.
+        container.getEventBus().register(RegistryEvents.class);
     }
 
-    @EventBusSubscriber(modid = BrewinAndChewin.MODID, bus = EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
         @SubscribeEvent
         public static void registerCapabilities(RegisterCapabilitiesEvent event) {
@@ -94,6 +95,7 @@ public class BrewinAndChewinNeoForge {
             register(event, Registries.MENU, BnCMenuTypes::registerAll);
             register(event, Registries.PARTICLE_TYPE, BnCParticleTypes::registerAll);
             register(event, Registries.RECIPE_TYPE, BnCRecipeTypes::registerAll);
+            register(event, Registries.RECIPE_BOOK_CATEGORY, BnCRecipeBookCategories::registerAll);
             register(event, Registries.RECIPE_SERIALIZER, BnCRecipeSerializers::registerAll);
         }
 
@@ -106,8 +108,6 @@ public class BrewinAndChewinNeoForge {
                     .playToClient(SyncNumbedHeartsClientboundPacket.TYPE, SyncNumbedHeartsClientboundPacket.STREAM_CODEC, (payload, context) -> payload.handle())
                     .playToClient(SyncRagingStacksClientboundPacket.TYPE, SyncRagingStacksClientboundPacket.STREAM_CODEC, (payload, context) -> payload.handle())
                     .playToServer(JEITransferKegRecipeServerboundPacket.TYPE, JEITransferKegRecipeServerboundPacket.STREAM_CODEC, (payload, context) -> payload.handle((ServerPlayer) context.player()))
-                    .playToServer(EMIFillFermentingRecipeServerboundPacket.TYPE, EMIFillFermentingRecipeServerboundPacket.STREAM_CODEC, (payload, context) -> payload.handle((ServerPlayer) context.player()))
-                    .playToServer(EMIFillPouringRecipeServerboundPacket.TYPE, EMIFillPouringRecipeServerboundPacket.STREAM_CODEC, (payload, context) -> payload.handle((ServerPlayer) context.player()))
                     .playToServer(SetLabelContentsServerboundPacket.TYPE, SetLabelContentsServerboundPacket.STREAM_CODEC, (payload, context) -> payload.handle((ServerPlayer) context.player()));
         }
 
@@ -124,10 +124,6 @@ public class BrewinAndChewinNeoForge {
             float[] innards = BnCInnardsDrops.DROPS.get(event.getName());
             if (innards != null)
                 event.getTable().addPool(BnCInnardsDrops.pool(innards[0], innards[1]).build());
-        }
-        @SubscribeEvent
-        public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-
         }
     }
 

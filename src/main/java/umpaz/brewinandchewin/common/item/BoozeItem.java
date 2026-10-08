@@ -108,7 +108,7 @@ public class BoozeItem extends Item {
 
     @Override
     public SoundEvent getEatingSound() {
-        return SoundEvents.GENERIC_DRINK;
+        return SoundEvents.GENERIC_DRINK.value();
     }
 
     //Tipsy Stuff

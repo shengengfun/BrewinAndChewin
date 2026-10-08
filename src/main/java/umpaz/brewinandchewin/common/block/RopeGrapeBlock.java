@@ -110,7 +110,7 @@ public class RopeGrapeBlock extends Block implements SimpleWaterloggedBlock, Bon
     @Override
     public BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
         if (state.getValue(WATERLOGGED))
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         return state;
     }
 
@@ -118,7 +118,7 @@ public class RopeGrapeBlock extends Block implements SimpleWaterloggedBlock, Bon
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbourBlock, BlockPos neighbourPos, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, neighbourBlock, neighbourPos, movedByPiston);
         if (!level.isClientSide())
-            level.scheduleTick(pos, this, 1);
+            ticks.scheduleTick(pos, this, 1);
     }
 
     @Override

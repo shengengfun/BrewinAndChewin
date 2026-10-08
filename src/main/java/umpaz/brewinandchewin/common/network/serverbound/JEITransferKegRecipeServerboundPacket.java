@@ -55,7 +55,7 @@ public record JEITransferKegRecipeServerboundPacket(Identifier recipeId,
     }
 
     public void handle(ServerPlayer sender) {
-        sender.server.execute(() -> {
+        sender.getServer().execute(() -> {
             if (!BrewinAndChewin.getHelper().isModLoaded("jei"))
                 return;
             var recipe = sender.getServer().getRecipeManager().byKey(recipeId());
