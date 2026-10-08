@@ -22,3 +22,7 @@ eclipse
 run
 runs
 .cache
+# Vendored dependency jars (no 26.1 maven yet) - see libs/README.md
+libs/*.jar
+
+# Gradle

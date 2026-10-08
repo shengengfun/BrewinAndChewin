@@ -1,0 +1,118 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+    id 'idea'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = 'BrewinAndChewin'
+}
+
+// MC 26.1.2 ships Java 25 to end users.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+    exclude '**/*.bbmodel'
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+repositories {
+    mavenCentral()
+    // JEI publishes to BlameJared; modmaven mirrors the same artifacts and stays reachable
+    // from networks that cannot open a connection to maven.blamejared.com.
+    maven { url = 'https://modmaven.dev/' }
+    maven { url = 'https://maven.blamejared.com/' }
+}
+
+dependencies {
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // Vendored jars: no 26.1 maven exists for either yet.
+    compileOnly files(farmersdelight_jar)
+    localRuntime files(farmersdelight_jar)
+    compileOnly files(appleskin_jar)
+    localRuntime files(appleskin_jar)
+}
+
+tasks.withType(ProcessResources).configureEach {
+    // Keep non-ASCII mod metadata intact; the default is the platform charset (GBK here).
+    filteringCharset = 'UTF-8'
+    var replaceProperties = [
+            minecraft_version         : minecraft_version,
+            minecraft_version_range   : minecraft_version_range,
+            neo_version               : neo_version,
+            neoforge_loader_version_range: neoforge_loader_version_range,
+            mod_id                    : mod_id,
+            mod_name                  : mod_name,
+            mod_license               : mod_license,
+            mod_version               : mod_version,
+            mod_authors               : mod_authors,
+            mod_description           : mod_description,
+            sources                   : sources,
+            farmers_delight_range     : farmers_delight_range,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    // Porting aid: javac stops at 100 errors by default, which hides the real work list.
+    options.compilerArgs << '-Xmaxerrs' << '10000'
+}
+
+// Porting aid: hand the same classpath javac would see to a standalone javac run, so the
+// error log is not re-wrapped by Gradle's console writer.
+tasks.register('dumpCompileClasspath') {
+    def out = layout.buildDirectory.file('compile-classpath.txt')
+    def cp = sourceSets.main.compileClasspath
+    inputs.files(cp)
+    outputs.file(out)
+    doLast {
+        out.get().asFile.text = cp.files.join(File.pathSeparator)
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
