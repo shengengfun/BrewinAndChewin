@@ -9,7 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import umpaz.brewinandchewin.BrewinAndChewin;
-import umpaz.brewinandchewin.client.recipebook.BnCRecipeBookCategories;
+import umpaz.brewinandchewin.common.registry.BnCRecipeBookCategories;
 import umpaz.brewinandchewin.common.BnCRecipeBookTypes;
 
 public record SendRecipeBookValuesClientboundPacket(boolean open, boolean filtering) implements CustomPacketPayload {

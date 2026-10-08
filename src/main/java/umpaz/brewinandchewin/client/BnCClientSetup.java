@@ -4,11 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.client.color.block.BlockColor;
-import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.particle.ParticleEngine;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.BlockPos;
@@ -103,33 +100,7 @@ public class BnCClientSetup {
         }
     }
 
-    public static void registerItemColorHandlers(BiConsumer<ItemColor, ItemLike> consumer) {
-        ItemColor labelTint = (stack, tintIndex) ->
-                tintIndex == 1 && BnCLabelUtils.getLabel(stack).isPresent() ? BnCLabelUtils.getLabelColor(stack) : -1;
-        for (Item item : BnCItems.CREATIVE_TAB_ITEMS) {
-            if (item instanceof WineItem)
-                consumer.accept(labelTint, item);
-        }
-        consumer.accept((stack, tintIndex) -> tintIndex == 0 ? BnCLabelUtils.getDyeColor(stack) : -1, BnCItems.LABEL);
-    }
-
-    public static void registerRenderTypes(BiConsumer<Block, RenderType> consumer) {
-        consumer.accept(BnCBlocks.AGING_CASK, RenderType.cutout());
-        consumer.accept(BnCBlocks.BOTTLE_RACK, RenderType.cutout());
-        consumer.accept(BnCBlocks.CORN_CROP, RenderType.cutout());
-        consumer.accept(BnCBlocks.WILD_CORN, RenderType.cutout());
-        consumer.accept(BnCBlocks.WILD_GRAPES, RenderType.cutout());
-        consumer.accept(BnCBlocks.TRELLIS, RenderType.cutout());
-        consumer.accept(BnCBlocks.TRELLIS_GRAPE, RenderType.cutout());
-        consumer.accept(BnCBlocks.RED_GRAPE_BUSH, RenderType.cutout());
-        consumer.accept(BnCBlocks.WHITE_GRAPE_BUSH, RenderType.cutout());
-        consumer.accept(BnCBlocks.RED_GRAPE_STEM, RenderType.cutout());
-        consumer.accept(BnCBlocks.WHITE_GRAPE_STEM, RenderType.cutout());
-        consumer.accept(BnCBlocks.RED_ROPE_GRAPE, RenderType.cutout());
-        consumer.accept(BnCBlocks.WHITE_ROPE_GRAPE, RenderType.cutout());
-    }
-
-    public static void registerParticles(BiConsumer<ParticleType<?>, ParticleEngine.SpriteParticleRegistration> consumer) {
+    public static void registerParticles(BiConsumer<ParticleType<?>, ParticleResources.SpriteParticleRegistration<?>> consumer) {
         consumer.accept(BnCParticleTypes.FOG, SteamParticle.Factory::new);
         consumer.accept(BnCParticleTypes.DRUNK_BUBBLE, DrunkBubbleParticle.Factory::new);
         consumer.accept(BnCParticleTypes.RAGING_STAGE_1, RagingParticle.Factory::new);
@@ -140,45 +111,6 @@ public class BnCClientSetup {
 
     public static void registerReloadListeners(Consumer<IdentifiableListener> consumer) {
         consumer.accept(BnCFluidItemDisplays.Loader.INSTANCE);
-    }
-
-    public static void registerColorHandlers(BiConsumer<BlockColor, Block> consumer) {
-        consumer.accept((state, level, pos, pTintIndex) -> {
-            if (level != null && pos != null && level.getBlockEntity(pos) instanceof CoasterBlockEntity blockEntity) {
-                int tintIndex = -1;
-                int count = 0;
-                for (ItemStack item : blockEntity.getItems()) {
-                    if (!item.isEmpty())
-                        ++count;
-                }
-                for (int i = 0; i < count; i++) {
-                    ItemStack stack = blockEntity.getItems().get(i);
-                    Identifier itemId = BuiltInRegistries.ITEM.getKey(stack.getItem());
-                    List<CoasterBlockEntityRenderer.ModelEntry> modelEntries = CoasterBlockEntityRenderer.getModelEntries(itemId);
-
-                    if (modelEntries != null) {
-                        for (CoasterBlockEntityRenderer.ModelEntry modelEntry : modelEntries) {
-                            int color = 0XFFFFFFFF;
-                            for (TextureModifier modifier : modelEntry.modifiers()) {
-                                color = modifier.color(level, state, pos, stack, color);
-                            }
-                            if (color != -1) {
-                                ++tintIndex;
-                                if (tintIndex == pTintIndex)
-                                    return color;
-                            }
-                        }
-                    }
-                }
-            }
-            return -1;
-        }, BnCBlocks.COASTER);
-
-        consumer.accept((state, level, pos, tintIndex) -> {
-            if (level == null || pos == null || !(level.getBlockEntity(pos) instanceof BottleRackBlockEntity rack))
-                return -1;
-            return BnCLabelUtils.getLabelColor(rack.getItem(tintIndex));
-        }, BnCBlocks.BOTTLE_RACK);
     }
 
     public static final Set<Identifier> MODELS = new HashSet<>();
