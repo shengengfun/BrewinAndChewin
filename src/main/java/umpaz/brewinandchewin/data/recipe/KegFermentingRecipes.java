@@ -2,7 +2,10 @@ package umpaz.brewinandchewin.data.recipe;
 
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.Item;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
@@ -21,6 +24,7 @@ public class KegFermentingRecipes {
    public static final float LARGE_EXP = 2.0F;
 
    public static void register(RecipeOutput output, HolderLookup.Provider provider) {
+        HolderGetter<Item> items = provider.lookupOrThrow(Registries.ITEM);
       fermentingDrinks(output, provider);
       fermentingWines(output, provider);
       fermentingMeals(output, provider);
@@ -211,7 +215,7 @@ public class KegFermentingRecipes {
               .addIngredient(BnCTags.Items.FOOD_JERKY_MEAT)
               .addIngredient(BnCTags.Items.FOOD_JERKY_MEAT)
               .addIngredient(BnCTags.Items.FOOD_JERKY_MEAT)
-              .unlockedBy("has_raw_meat", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(BnCTags.Items.FOOD_JERKY_MEAT)))
+              .unlockedBy("has_raw_meat", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items, BnCTags.Items.FOOD_JERKY_MEAT)))
               .build(output);
 
 
@@ -226,7 +230,7 @@ public class KegFermentingRecipes {
               .addIngredient(CommonTags.Items.FOODS_SAFE_RAW_FISH)
               .addIngredient(CommonTags.Items.FOODS_SAFE_RAW_FISH)
               .addIngredient(Items.DRIED_KELP)
-              .unlockedBy("has_fish", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(CommonTags.Items.FOODS_SAFE_RAW_FISH).build()))
+              .unlockedBy("has_fish", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items, CommonTags.Items.FOODS_SAFE_RAW_FISH).build()))
               .build(output);
 
       KegFermentingRecipeBuilder.kegFermentingRecipe(FermentingBookCategory.MEALS, BnCItems.PICKLED_PICKLES, 2, MEDIUM_EXP, 2)

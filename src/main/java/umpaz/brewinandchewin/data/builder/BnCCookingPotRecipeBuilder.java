@@ -84,7 +84,7 @@ public class BnCCookingPotRecipeBuilder{
     }
 
     public BnCCookingPotRecipeBuilder unlockedByAnyIngredient(ItemLike... items) {
-        advancement.addCriterion("has_any_ingredient", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items).build()));
+        advancement.addCriterion("has_any_ingredient", InventoryChangeTrigger.TriggerInstance.hasItems(items));
         return this;
     }
 

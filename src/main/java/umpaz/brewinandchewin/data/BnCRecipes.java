@@ -25,7 +25,7 @@ public class BnCRecipes extends RecipeProvider
     protected void buildRecipes(RecipeOutput output, HolderLookup.Provider provider) {
         KegFermentingRecipes.register(output, provider);
         KegPouringRecipes.register(output);
-        BnCCookingPotRecipes.register(output);
+        BnCCookingPotRecipes.register(output, provider.lookupOrThrow(Registries.ITEM));
         BnCCookingRecipes.register(output);
         BnCCraftingRecipes.register(output, provider.lookupOrThrow(Registries.ITEM));
         BnCCuttingBoardRecipes.register(output);

@@ -124,7 +124,7 @@ public class BrewinAndChewinNeoForge {
         public static void onLootTableLoad(LootTableLoadEvent event) {
             float[] innards = BnCInnardsDrops.DROPS.get(event.getName());
             if (innards != null)
-                event.getTable().addPool(BnCInnardsDrops.pool(innards[0], innards[1]).build());
+                event.getTable().addPool(BnCInnardsDrops.pool(innards[0], innards[1], event.getRegistries().lookupOrThrow(Registries.ITEM)).build());
         }
     }
 

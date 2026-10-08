@@ -2,6 +2,7 @@ package umpaz.brewinandchewin.data.loot;
 
 import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
@@ -86,8 +87,8 @@ public class BnCBlockLoot extends BlockLootSubProvider {
 
     private static LootItemCondition.Builder shears() {
         return AnyOfCondition.anyOf(
-                MatchTool.toolMatches(ItemPredicate.Builder.item().of(Tags.Items.TOOLS_SHEAR)),
-                MatchTool.toolMatches(ItemPredicate.Builder.item().of(Items.SHEARS)));
+                MatchTool.toolMatches(ItemPredicate.Builder.item().of(this.registries.lookupOrThrow(Registries.ITEM), Tags.Items.TOOLS_SHEAR)),
+                MatchTool.toolMatches(ItemPredicate.Builder.item().of(this.registries.lookupOrThrow(Registries.ITEM), Items.SHEARS)));
     }
 
     private LootTable.Builder createWildGrapesDrops(Block block) {
@@ -135,7 +136,7 @@ public class BnCBlockLoot extends BlockLootSubProvider {
                 .withPool(this.applyExplosionDecay(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F))
                         .add(LootItem.lootTableItem(ModItems.STRAW.get()))
                         .when(cornAgeIs(block, CornCropBlock.MAX_AGE))
-                        .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(ModTags.Items.STRAW_HARVESTERS)))));
+                        .when(MatchTool.toolMatches(ItemPredicate.Builder.item().of(this.registries.lookupOrThrow(Registries.ITEM), ModTags.Items.STRAW_HARVESTERS)))));
     }
 
     private LootTable.Builder createGrapeBushDrops(Block block, Item seeds) {

@@ -143,7 +143,7 @@ public class KegFermentingRecipeBuilder {
     }
 
     public KegFermentingRecipeBuilder unlockedByAnyIngredient(ItemLike... items) {
-        this.advancement.addCriterion("has_any_ingredient", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items).build()));
+        this.advancement.addCriterion("has_any_ingredient", InventoryChangeTrigger.TriggerInstance.hasItems(items));
         return this;
     }
 

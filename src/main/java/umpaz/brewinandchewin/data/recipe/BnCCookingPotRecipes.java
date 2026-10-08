@@ -2,6 +2,8 @@ package umpaz.brewinandchewin.data.recipe;
 
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.world.item.Item;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -22,7 +24,7 @@ public class BnCCookingPotRecipes {
     public static final float MEDIUM_EXP = 1.0F;
     public static final float LARGE_EXP = 2.0F;
 
-    public static void register(RecipeOutput consumer) {
+    public static void register(RecipeOutput consumer, HolderGetter<Item> items) {
         cook(consumer);
     }
 
@@ -87,7 +89,7 @@ public class BnCCookingPotRecipes {
                 .addIngredient(Tags.Items.FOODS_VEGETABLE)
                 .addIngredient(Tags.Items.FOODS_BREAD)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
-                .unlockedBy("has_cheese", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(BnCTags.Items.FOOD_CHEESE_WEDGE).build()))
+                .unlockedBy("has_cheese", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items, BnCTags.Items.FOOD_CHEESE_WEDGE).build()))
                 .build(consumer);
         BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.FIERY_FONDUE_POT, 1, SLOW_COOKING, LARGE_EXP, Items.CAULDRON)
                 .addIngredient(ModItems.TOMATO_SAUCE.get())
@@ -124,7 +126,7 @@ public class BnCCookingPotRecipes {
                 .addIngredient(CommonTags.Items.FOODS_ONION)
                 .addIngredient(Tags.Items.CROPS_CARROT)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
-                .unlockedBy("has_cheese", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(BnCTags.Items.FOOD_CHEESE_WEDGE).build()))
+                .unlockedBy("has_cheese", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items, BnCTags.Items.FOOD_CHEESE_WEDGE).build()))
                 .build(consumer);
 
 
