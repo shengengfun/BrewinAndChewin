@@ -44,7 +44,7 @@ public class BnCMobEffectTags extends IntrinsicHolderTagsProvider<MobEffect>
                 .add(MobEffects.STRENGTH.value())
                 .add(MobEffects.JUMP_BOOST.value())
                 .add(MobEffects.REGENERATION.value())
-                .add(MobEffects.DAMAGE_RESISTANCE.value())
+                .add(MobEffects.RESISTANCE.value())
                 .add(MobEffects.FIRE_RESISTANCE.value())
                 .add(MobEffects.WATER_BREATHING.value())
                 .add(MobEffects.NIGHT_VISION.value())

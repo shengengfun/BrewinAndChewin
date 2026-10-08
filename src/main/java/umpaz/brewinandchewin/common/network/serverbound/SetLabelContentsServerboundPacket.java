@@ -31,13 +31,13 @@ public record SetLabelContentsServerboundPacket(boolean offhand, String text, bo
     }
 
     public void handle(ServerPlayer sender) {
-        sender.server.execute(() -> {
+        sender.level().getServer().execute(() -> {
             ItemStack stack = sender.getItemInHand(offhand() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
             if (!(stack.getItem() instanceof LabelItem))
                 return;
             LabelContents contents = BnCLabelUtils.readFromItem(stack)
                     .withText(text())
-                    .withAuthor(sender.getGameProfile().getName())
+                    .withAuthor(sender.getGameProfile().name())
                     .withShowAuthor(showAuthor())
                     .withShowAuthenticity(showAuthenticity())
                     .withHideEffects(hideEffects());

@@ -17,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.access.LootParamsParamSetAccess;
 import umpaz.brewinandchewin.common.mixin.LootContextAccessor;
+import umpaz.brewinandchewin.common.mixin.ContextMapAccessor;
 import umpaz.brewinandchewin.common.mixin.LootParamsAccessor;
 
 import java.util.Arrays;
@@ -57,13 +58,13 @@ public class AreaLocationCheckCondition implements LootItemCondition {
                     Vec3 offset = vec3.add(x, y, z);
                     LootParams.Builder paramBuilder = new LootParams.Builder(context.getLevel());
                     LootParams originalParams = ((LootContextAccessor)context).brewinandchewin$getParams();
-                    for (Map.Entry<ContextKey<?>, Object> entry : ((LootParamsAccessor)originalParams).brewinandchewin$getParams().entrySet()) {
+                    for (Map.Entry<ContextKey<?>, Object> entry : ((ContextMapAccessor) ((LootParamsAccessor) originalParams).brewinandchewin$getParams()).brewinandchewin$getParams().entrySet()) {
                         paramBuilder.withParameter((ContextKey) entry.getKey(), entry.getValue());
                     }
                     paramBuilder.withParameter(LootContextParams.ORIGIN, offset);
-                    if (context.hasParam(LootContextParams.BLOCK_STATE))
+                    if (context.hasParameter(LootContextParams.BLOCK_STATE))
                         paramBuilder.withOptionalParameter(LootContextParams.BLOCK_STATE, context.getLevel().getBlockState(BlockPos.containing(offset)));
-                    if (context.hasParam(LootContextParams.BLOCK_ENTITY))
+                    if (context.hasParameter(LootContextParams.BLOCK_ENTITY))
                         paramBuilder.withOptionalParameter(LootContextParams.BLOCK_ENTITY, context.getLevel().getBlockEntity(BlockPos.containing(offset)));
                     LootContext newCtx = new LootContext.Builder(paramBuilder.create(((LootParamsParamSetAccess) originalParams).brewinandchewin$getParamSet())).create(Optional.empty());
                     if (composedPredicate.test(newCtx))
@@ -84,7 +85,7 @@ public class AreaLocationCheckCondition implements LootItemCondition {
         LootItemCondition.super.validate(pContext);
 
         for(int i = 0; i < terms.size(); ++i)
-            this.terms.get(i).validate(pContext.forChild(".term[" + i + "]"));
+            this.terms.get(i).validate(pContext.forField("term[" + i + "]"));
 
     }
 

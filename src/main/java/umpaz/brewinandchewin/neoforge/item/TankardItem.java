@@ -11,6 +11,10 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.fluids.capability.FluidResourceHandlerItemAdapter;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import umpaz.brewinandchewin.common.registry.BnCItems;
 
 
@@ -30,12 +34,15 @@ public class TankardItem extends Item {
         BlockState state = level.getBlockState(pos);
         BlockEntity be = level.getBlockEntity(pos);
 
-        IFluidHandler handler = Capabilities.FluidHandler.BLOCK.getCapability(level, pos, state, be,context.getClickedFace());
+        ResourceHandler<FluidResource> blockHandler = Capabilities.Fluid.BLOCK.getCapability(level, pos, state, be, context.getClickedFace());
+        IFluidHandler handler = blockHandler == null ? null : IFluidHandler.of(blockHandler);
 
         if (handler == null)
             return InteractionResult.PASS;
 
-        IFluidHandlerItem itemHandler = Capabilities.FluidHandler.ITEM.getCapability(stack, null);
+        ItemAccess access = ItemAccess.forStack(stack);
+        ResourceHandler<FluidResource> itemResourceHandler = Capabilities.Fluid.ITEM.getCapability(stack, access);
+        IFluidHandlerItem itemHandler = itemResourceHandler == null ? null : new FluidResourceHandlerItemAdapter(itemResourceHandler, access);
         if (itemHandler == null)
             return InteractionResult.PASS;
 

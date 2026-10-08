@@ -14,7 +14,7 @@ import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.client.utility.BnCClientTextUtils;
 import umpaz.brewinandchewin.neoforge.client.integration.IntoxicationAppleSkinCompatNeoForge;
 
-@EventBusSubscriber(modid = BrewinAndChewin.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = BrewinAndChewin.MODID, value = Dist.CLIENT)
 public class TipsyEffects {
     @SubscribeEvent
     public static void whatsYourName(RenderNameTagEvent event) {

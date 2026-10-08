@@ -49,7 +49,7 @@ public class WildGrapesFeature extends Feature<NoneFeatureConfiguration> {
                 int top = level.getHeight(Heightmap.Types.MOTION_BLOCKING, cx, cz);
                 for (int depth = 0; depth < SCAN_DEPTH; ++depth) {
                     cursor.set(cx, top - depth, cz);
-                    if (cursor.getY() < level.getMinBuildHeight())
+                    if (cursor.getY() < level.getMinY())
                         break;
                     if (WildGrapesBlock.canGrowOn(level.getBlockState(cursor)))
                         columns.computeIfAbsent(BlockPos.asLong(cx, 0, cz),

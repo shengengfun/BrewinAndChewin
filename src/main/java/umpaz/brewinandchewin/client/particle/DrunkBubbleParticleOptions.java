@@ -24,9 +24,9 @@ public class DrunkBubbleParticleOptions extends ScalableParticleOptionsBase {
    private final Vector3f color;
 
 
-   public DrunkBubbleParticleOptions(Vector3f color, float size) {
+   public DrunkBubbleParticleOptions(org.joml.Vector3fc color, float size) {
       super(size);
-      this.color = color;
+      this.color = new Vector3f(color);
    }
 
    public Vector3f getColor() {

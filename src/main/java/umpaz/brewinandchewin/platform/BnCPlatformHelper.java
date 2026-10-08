@@ -78,12 +78,12 @@ public interface BnCPlatformHelper {
         return createKegSlot(inventory, slot, x, y, true, null);
     }
     default Slot createKegContainerSlot(AbstractedItemHandler inventory, int slot, int x, int y) {
-        return createKegSlot(inventory, slot, x, y, true, Pair.of(InventoryMenu.BLOCK_ATLAS, KegMenu.EMPTY_CONTAINER_SLOT_TANKARD));
+        return createKegSlot(inventory, slot, x, y, true, KegMenu.EMPTY_CONTAINER_SLOT_TANKARD);
     }
     default Slot createKegResultSlot(AbstractedItemHandler inventory, int slot, int x, int y) {
         return createKegSlot(inventory, slot, x, y, false, null);
     }
-    Slot createKegSlot(AbstractedItemHandler inventory, int slot, int x, int y, boolean canInsert, @Nullable Pair<Identifier, Identifier> noItemIcon);
+    Slot createKegSlot(AbstractedItemHandler inventory, int slot, int x, int y, boolean canInsert, @Nullable Identifier noItemIcon);
 
 
     KegRecipeWrapper createRecipeWrapper(AbstractedItemHandler itemHandler, AbstractedFluidTank fluidTank);

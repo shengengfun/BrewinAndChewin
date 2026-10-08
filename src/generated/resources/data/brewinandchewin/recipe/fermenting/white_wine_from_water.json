@@ -9,16 +9,9 @@
   },
   "experience": 1.0,
   "ingredients": [
-    {
-      "item": "brewinandchewin:white_grapes"
-    },
-    {
-      "item": "brewinandchewin:white_grapes"
-    },
-    {
-      "item": "brewinandchewin:white_grapes"
-    },
-    []
+    "brewinandchewin:white_grapes",
+    "brewinandchewin:white_grapes",
+    "brewinandchewin:white_grapes"
   ],
   "result": {
     "amount": 1000,

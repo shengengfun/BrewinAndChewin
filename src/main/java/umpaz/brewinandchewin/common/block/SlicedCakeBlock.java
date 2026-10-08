@@ -36,6 +36,7 @@ import umpaz.brewinandchewin.common.utility.BnCShapeUtils;
 import vectorwing.farmersdelight.common.tag.ModTags;
 
 import java.util.function.Supplier;
+import net.minecraft.world.item.component.Consumable;
 
 public class SlicedCakeBlock extends Block {
     public static final int MAX_BITES = 6;
@@ -98,17 +99,17 @@ public class SlicedCakeBlock extends Block {
     }
 
     private InteractionResult eatBite(Level level, BlockPos pos, BlockState state, Player player) {
-        FoodProperties food = this.getSliceItem().get(DataComponents.FOOD);
+        ItemStack slice = this.getSliceItem();
+        FoodProperties food = slice.get(DataComponents.FOOD);
         if (food == null || !player.canEat(food.canAlwaysEat()))
             return InteractionResult.PASS;
 
         if (!level.isClientSide()) {
             player.getFoodData().eat(food);
-            for (FoodProperties.PossibleEffect possible : food.effects()) {
-                if (level.getRandom().nextFloat() < possible.probability())
-                    player.addEffect(possible.effect());
-            }
-            level.playSound(null, pos, SoundEvents.GENERIC_EAT, SoundSource.PLAYERS, 0.8F, 0.8F);
+            Consumable consumable = slice.get(DataComponents.CONSUMABLE);
+            if (consumable != null)
+                consumable.onConsume(level, player, slice.copyWithCount(1));
+            level.playSound(null, pos, SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 0.8F, 0.8F);
             this.removeBite(level, pos, state);
             player.awardStat(Stats.EAT_CAKE_SLICE);
         }
@@ -145,7 +146,7 @@ public class SlicedCakeBlock extends Block {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         return MAX_BITES - state.getValue(BITES);
     }
 

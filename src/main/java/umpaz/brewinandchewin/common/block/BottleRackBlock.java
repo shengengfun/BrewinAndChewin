@@ -39,6 +39,7 @@ import umpaz.brewinandchewin.common.tag.BnCTags;
 
 import java.util.Optional;
 import java.util.OptionalInt;
+import net.minecraft.server.level.ServerLevel;
 
 public class BottleRackBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
     public static final MapCodec<BottleRackBlock> CODEC = simpleCodec(BottleRackBlock::new);
@@ -177,13 +178,10 @@ public class BottleRackBlock extends BaseEntityBlock implements SimpleWaterlogge
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            if (level.getBlockEntity(pos) instanceof BottleRackBlockEntity rack) {
-                Containers.dropContents(level, pos, rack.getItems());
-                level.updateNeighbourForOutputSignal(pos, this);
-            }
-            super.onRemove(state, level, pos, newState, isMoving);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        if (level.getBlockEntity(pos) instanceof BottleRackBlockEntity rack) {
+            Containers.dropContents(level, pos, rack.getItems());
+            Containers.updateNeighboursAfterDestroy(state, level, pos);
         }
     }
 
@@ -193,7 +191,7 @@ public class BottleRackBlock extends BaseEntityBlock implements SimpleWaterlogge
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         if (level.getBlockEntity(pos) instanceof BottleRackBlockEntity rack) {
             return rack.countFilledSlots() * 15 / BottleRackBlockEntity.SLOT_COUNT;
         }

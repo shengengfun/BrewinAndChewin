@@ -28,7 +28,7 @@ public class BnCCraftingRecipes {
                 .pattern("sss")
                 .define('s', Items.STICK)
                 .unlockedBy("has_stick", InventoryChangeTrigger.TriggerInstance.hasItems(Items.STICK))
-                .save(consumer, BrewinAndChewin.asResource("trellis").toString());
+                .save(consumer);
 
         ShapedRecipeBuilder.shaped(items, RecipeCategory.FOOD, BnCItems.RICH_CHOCOLATE_CAKE)
                 .pattern("msm")
@@ -85,19 +85,19 @@ public class BnCCraftingRecipes {
                 .requires(BnCItems.COCOA_FUDGE)
                 .requires(BnCItems.GLOW_BERRY_MARMALADE)
                 .unlockedBy("has_marmalade", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.GLOW_BERRY_MARMALADE))
-                .save(consumer, BrewinAndChewin.asResource("glow_brownie").toString());
+                .save(consumer);
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.FOOD, BnCItems.APPLE_TURNOVER, 2)
                 .requires(ModItems.WHEAT_DOUGH.get())
                 .requires(BnCItems.APPLE_JELLY)
                 .requires(Items.SUGAR)
                 .unlockedBy("has_jelly", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.APPLE_JELLY))
-                .save(consumer, BrewinAndChewin.asResource("apple_turnover").toString());
+                .save(consumer);
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.FOOD, BnCItems.JAM_SANDWICH, 2)
                 .requires(Items.BREAD)
                 .requires(BnCTags.Items.JAMS)
                 .requires(Items.BREAD)
                 .unlockedBy("has_jam", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.SWEET_BERRY_JAM))
-                .save(consumer, BrewinAndChewin.asResource("jam_sandwich").toString());
+                .save(consumer);
 
         ShapedRecipeBuilder.shaped(items, RecipeCategory.FOOD, BnCItems.RAW_CROISSANT, 5)
                 .pattern("ddd")
@@ -105,19 +105,19 @@ public class BnCCraftingRecipes {
                 .define('d', ModItems.WHEAT_DOUGH.get())
                 .define('e', Tags.Items.EGGS)
                 .unlockedBy("has_dough", InventoryChangeTrigger.TriggerInstance.hasItems(ModItems.WHEAT_DOUGH.get()))
-                .save(consumer, BrewinAndChewin.asResource("raw_croissant").toString());
+                .save(consumer);
         ShapedRecipeBuilder.shaped(items, RecipeCategory.FOOD, BnCItems.RAW_MUFFIN, 5)
                 .pattern("ddd")
                 .pattern("ded")
                 .define('d', BnCItems.CORN_DOUGH)
                 .define('e', Tags.Items.EGGS)
                 .unlockedBy("has_corn_dough", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.CORN_DOUGH))
-                .save(consumer, BrewinAndChewin.asResource("raw_muffin").toString());
+                .save(consumer);
 
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.MISC, BnCItems.CORN_KERNELS)
                 .requires(BnCItems.CORN)
                 .unlockedBy("has_corn", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.CORN))
-                .save(consumer, BrewinAndChewin.asResource("corn_kernels").toString());
+                .save(consumer);
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.FOOD, BnCItems.CORN_DOUGH)
                 .requires(BnCItems.CORNMEAL)
                 .requires(Items.WATER_BUCKET)
@@ -135,7 +135,7 @@ public class BnCCraftingRecipes {
                 .requires(BnCItems.FLAXEN_CHEESE_WEDGE)
                 .requires(Items.BREAD)
                 .unlockedBy("has_cheese", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.FLAXEN_CHEESE_WEDGE))
-                .save(consumer, BrewinAndChewin.asResource("ham_and_cheese_sandwich").toString());
+                .save(consumer);
 
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.FOOD, BnCItems.HAM_AND_CHEESE_SANDWICH)
                 .requires(Items.BREAD)
@@ -154,7 +154,7 @@ public class BnCCraftingRecipes {
                 .define('p', BnCTags.Items.FOOD_PIZZA_TOPPING)
                 .define('f', BnCTags.Items.FOOD_CHEESE_WEDGE)
                 .unlockedBy("has_cheese", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.FLAXEN_CHEESE_WEDGE))
-                .save(consumer, BrewinAndChewin.asResource("pizza").toString());
+                .save(consumer);
         ShapedRecipeBuilder.shaped(items, RecipeCategory.FOOD, BnCItems.QUICHE)
                 .pattern("blb")
                 .pattern("mcm")
@@ -221,7 +221,7 @@ public class BnCCraftingRecipes {
                 .define('h', Items.HONEYCOMB)
                 .define('p', ItemTags.PLANKS)
                 .unlockedBy("has_honeycomb", InventoryChangeTrigger.TriggerInstance.hasItems(Items.HONEYCOMB))
-                .save(consumer, BrewinAndChewin.asResource("keg").toString());
+                .save(consumer);
 
         ShapedRecipeBuilder.shaped(items, RecipeCategory.MISC, BnCItems.TANKARD, 4)
                 .pattern("p p")
@@ -230,7 +230,7 @@ public class BnCCraftingRecipes {
                 .define('i', Items.IRON_NUGGET)
                 .define('p', ItemTags.PLANKS)
                 .unlockedBy("has_nugget", InventoryChangeTrigger.TriggerInstance.hasItems(Items.IRON_NUGGET))
-                .save(consumer, BrewinAndChewin.asResource("tankard").toString());
+                .save(consumer);
 
         ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, BnCItems.HEATING_CASK, 1)
                 .pattern("sss")
@@ -242,7 +242,7 @@ public class BnCCraftingRecipes {
                 .define('C', Items.BLAZE_POWDER)
                 .define('m', Items.MAGMA_BLOCK)
                 .unlockedBy("has_powder", InventoryChangeTrigger.TriggerInstance.hasItems(Items.BLAZE_POWDER))
-                .save(consumer, BrewinAndChewin.asResource("heating_cask").toString());
+                .save(consumer);
 
         ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, BnCItems.ICE_CRATE, 1)
                 .pattern("pSp")
@@ -253,7 +253,7 @@ public class BnCCraftingRecipes {
                 .define('p', ItemTags.PLANKS)
                 .define('s', ItemTags.WOODEN_SLABS)
                 .unlockedBy("has_ice", InventoryChangeTrigger.TriggerInstance.hasItems(Items.PACKED_ICE))
-                .save(consumer, BrewinAndChewin.asResource("ice_crate").toString());
+                .save(consumer);
 
         ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, BnCItems.AGING_CASK, 1)
                 .pattern("ipi")
@@ -263,7 +263,7 @@ public class BnCCraftingRecipes {
                 .define('p', ItemTags.PLANKS)
                 .define('h', Items.HONEYCOMB)
                 .unlockedBy("has_honeycomb", InventoryChangeTrigger.TriggerInstance.hasItems(Items.HONEYCOMB))
-                .save(consumer, BrewinAndChewin.asResource("aging_cask").toString());
+                .save(consumer);
 
         ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, BnCItems.BOTTLE_RACK, 1)
                 .pattern("psp")
@@ -273,7 +273,7 @@ public class BnCCraftingRecipes {
                 .define('s', ItemTags.WOODEN_SLABS)
                 .define('h', Items.HONEYCOMB)
                 .unlockedBy("has_honeycomb", InventoryChangeTrigger.TriggerInstance.hasItems(Items.HONEYCOMB))
-                .save(consumer, BrewinAndChewin.asResource("bottle_rack").toString());
+                .save(consumer);
 
 
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.MISC, BnCItems.LABEL, 3)
@@ -282,16 +282,16 @@ public class BnCCraftingRecipes {
                 .requires(Items.PAPER)
                 .requires(Items.HONEYCOMB)
                 .unlockedBy("has_honeycomb", InventoryChangeTrigger.TriggerInstance.hasItems(Items.HONEYCOMB))
-                .save(consumer, BrewinAndChewin.asResource("label").toString());
+                .save(consumer);
 
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.MISC, BnCItems.RED_GRAPE_SEEDS, 1)
                 .requires(BnCItems.RED_GRAPES)
                 .unlockedBy("has_red_grapes", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.RED_GRAPES))
-                .save(consumer, BrewinAndChewin.asResource("red_grape_seeds").toString());
+                .save(consumer);
 
         ShapelessRecipeBuilder.shapeless(items, RecipeCategory.MISC, BnCItems.WHITE_GRAPE_SEEDS, 1)
                 .requires(BnCItems.WHITE_GRAPES)
                 .unlockedBy("has_white_grapes", InventoryChangeTrigger.TriggerInstance.hasItems(BnCItems.WHITE_GRAPES))
-                .save(consumer, BrewinAndChewin.asResource("white_grape_seeds").toString());
+                .save(consumer);
     }
 }

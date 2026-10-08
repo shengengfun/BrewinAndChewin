@@ -16,7 +16,7 @@ public class RagingParticle extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected RagingParticle(ClientLevel level, double x, double y, double z, double motionX, double motionY, double motionZ, float size, SpriteSet sprites) {
-        super(level, x, y, z, 0.5D - RANDOM.nextDouble(), motionY, 0.5D - RANDOM.nextDouble());
+        super(level, x, y, z, 0.5D - RANDOM.nextDouble(), motionY, 0.5D - RANDOM.nextDouble(), sprites.get(RANDOM));
         this.friction = 0.96F;
         this.gravity = -0.1F;
         this.speedUpWhenYMotionIsBlocked = true;

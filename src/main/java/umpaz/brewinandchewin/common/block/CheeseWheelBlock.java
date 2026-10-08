@@ -76,7 +76,7 @@ public class CheeseWheelBlock extends Block {
             }
             return InteractionResult.SUCCESS;
         }
-        player.displayClientMessage(BnCTextUtils.getTranslation("block.feast.use_knife"), true);
+        player.sendOverlayMessage(BnCTextUtils.getTranslation("block.feast.use_knife"));
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
@@ -86,7 +86,7 @@ public class CheeseWheelBlock extends Block {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos, Direction direction) {
         return blockState.getValue(SERVINGS);
     }
 

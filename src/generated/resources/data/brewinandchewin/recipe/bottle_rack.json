@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "h": {
-      "item": "minecraft:honeycomb"
-    },
-    "p": {
-      "tag": "minecraft:planks"
-    },
-    "s": {
-      "tag": "minecraft:wooden_slabs"
-    }
+    "h": "minecraft:honeycomb",
+    "p": "#minecraft:planks",
+    "s": "#minecraft:wooden_slabs"
   },
   "pattern": [
     "psp",
@@ -18,7 +12,6 @@
     "psp"
   ],
   "result": {
-    "count": 1,
     "id": "brewinandchewin:bottle_rack"
   }
 }

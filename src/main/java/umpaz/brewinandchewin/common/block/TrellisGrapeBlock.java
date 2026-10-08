@@ -145,11 +145,6 @@ public class TrellisGrapeBlock extends TrellisBlock implements BonemealableBlock
         level.setBlock(pos, hasVine(state) ? state : toTrellis(state), Block.UPDATE_ALL);
     }
 
-    @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        super.onRemove(state, level, pos, newState, movedByPiston);
-    }
-
     private static boolean sideFacingPlayer(BlockState state, BlockPos pos, Player player) {
         return (state.getValue(AXIS) == Direction.Axis.X
                 ? player.getX() - (pos.getX() + 0.5D)

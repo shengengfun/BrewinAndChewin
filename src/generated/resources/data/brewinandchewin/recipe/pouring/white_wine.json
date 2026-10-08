@@ -1,7 +1,6 @@
 {
   "type": "brewinandchewin:keg_pouring",
   "container": {
-    "count": 1,
     "id": "minecraft:glass_bottle"
   },
   "fluid": {
@@ -9,7 +8,6 @@
     "id": "brewinandchewin:white_wine"
   },
   "output": {
-    "count": 1,
     "id": "brewinandchewin:white_wine"
   },
   "unit": "millibuckets"

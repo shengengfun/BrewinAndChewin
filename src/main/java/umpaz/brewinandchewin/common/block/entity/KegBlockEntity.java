@@ -118,8 +118,8 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        input.read("Inventory", CompoundTag.CODEC).ifPresent(tag -> inventory.readFromNbt(tag, input.lookup()));
-        input.read("FluidTank", CompoundTag.CODEC).ifPresent(tag -> fluidTank.readFromNbt(tag, input.lookup()));
+        input.readChild("Inventory", inventory);
+        input.readChild("FluidTank", fluidTank);
         fermentTime = input.getIntOr("FermentTime", 0);
         fermentTimeTotal = input.getIntOr("FermentTimeTotal", 0);
         fermentFluid = input.getLongOr("FermentFluid", -1L);
@@ -174,9 +174,8 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         // ValueOutput carries no registry lookup (unlike ValueInput), so take it off the level.
-        HolderLookup.Provider registries = this.level != null ? this.level.registryAccess() : net.minecraft.core.RegistryAccess.EMPTY;
-        output.store("Inventory", CompoundTag.CODEC, inventory.writeToNbt(registries));
-        output.store("FluidTank", CompoundTag.CODEC, fluidTank.writeToNbt(registries));
+        output.putChild("Inventory", inventory);
+        output.putChild("FluidTank", fluidTank);
         output.putInt("FermentTime", fermentTime);
         output.putInt("FermentTimeTotal", fermentTimeTotal);
         output.putLong("FermentFluid", fermentFluid);
@@ -400,7 +399,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         if (level == null) return false;
 
         if (recipe.getResult().right().isPresent()
-                && !keg.inventory.insertItem(OUTPUT_SLOT, recipe.getResult().right().get().copy(), true).isEmpty()) {
+                && !keg.inventory.insertItem(OUTPUT_SLOT, recipe.getResult().right().get().create(), true).isEmpty()) {
             return false;
         }
 
@@ -429,7 +428,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
         if (recipe.getResult().right().isPresent()) {
             if (recipe.getFluidIngredient().isPresent())
                 keg.fluidTank.drain(recipe.getFluidIngredient().get().amount() * batches, recipe.getFluidIngredientUnit(), false);
-            keg.inventory.insertItem(OUTPUT_SLOT, recipe.getResult().right().get().copy(), false);
+            keg.inventory.insertItem(OUTPUT_SLOT, recipe.getResult().right().get().create(), false);
         }
 
 
@@ -581,7 +580,7 @@ public class KegBlockEntity extends SyncedBlockEntity implements MenuProvider, N
                     boolean fluidCheck = false;
                     if (r.isStrict() && ItemStack.isSameItemSameComponents(r.getContainer(), slot) || !r.isStrict() && (r.getContainer().getItem() == slot.getItem()))
                         containerCheck = true;
-                    if (!containerCheck && r.canFill() && (r.isStrict() && ItemStack.isSameItemSameComponents(r.assemble(recipeWrapper, level.registryAccess()), slot) || !r.isStrict() && r.assemble(recipeWrapper, level.registryAccess()).getItem() == slot.getItem()))
+                    if (!containerCheck && r.canFill() && (r.isStrict() && ItemStack.isSameItemSameComponents(r.assemble(recipeWrapper), slot) || !r.isStrict() && r.assemble(recipeWrapper).getItem() == slot.getItem()))
                         resultCheck = true;
                     if (recipeWrapper.getFluid().isEmpty() || (containerCheck && r.getRawFluid().fluid() == recipeWrapper.getFluid().fluid() || r.getFluid(slot).matches(recipeWrapper.getFluid())))
                         fluidCheck = true;

@@ -8,14 +8,19 @@ import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import vectorwing.farmersdelight.client.recipebook.CookingPotRecipeBookTab;
@@ -24,6 +29,7 @@ import vectorwing.farmersdelight.common.crafting.CookingPotRecipe;
 import javax.annotation.Nullable;
 
 public class BnCCookingPotRecipeBuilder{
+    private final HolderGetter<Item> itemLookup;
     private CookingPotRecipeBookTab tab;
     private final NonNullList<Ingredient> ingredients = NonNullList.create();
     private final ItemStack result;
@@ -32,7 +38,8 @@ public class BnCCookingPotRecipeBuilder{
     private final ItemStack container;
     private final Advancement.Builder advancement = Advancement.Builder.advancement();
 
-    private BnCCookingPotRecipeBuilder(ItemLike resultIn, int count, int cookingTime, float experience, @Nullable ItemLike container) {
+    private BnCCookingPotRecipeBuilder(HolderGetter<Item> itemLookup, ItemLike resultIn, int count, int cookingTime, float experience, @Nullable ItemLike container) {
+        this.itemLookup = itemLookup;
         this.result = new ItemStack(resultIn, count);
         this.cookingTime = cookingTime;
         this.experience = experience;
@@ -40,16 +47,16 @@ public class BnCCookingPotRecipeBuilder{
         this.tab = null;
     }
 
-    public static BnCCookingPotRecipeBuilder cookingPotRecipe(ItemLike mainResult, int count, int cookingTime, float experience) {
-        return new BnCCookingPotRecipeBuilder(mainResult, count, cookingTime, experience, null);
+    public static BnCCookingPotRecipeBuilder cookingPotRecipe(HolderGetter<Item> itemLookup, ItemLike mainResult, int count, int cookingTime, float experience) {
+        return new BnCCookingPotRecipeBuilder(itemLookup, mainResult, count, cookingTime, experience, null);
     }
 
-    public static BnCCookingPotRecipeBuilder cookingPotRecipe(ItemLike mainResult, int count, int cookingTime, float experience, ItemLike container) {
-        return new BnCCookingPotRecipeBuilder(mainResult, count, cookingTime, experience, container);
+    public static BnCCookingPotRecipeBuilder cookingPotRecipe(HolderGetter<Item> itemLookup, ItemLike mainResult, int count, int cookingTime, float experience, ItemLike container) {
+        return new BnCCookingPotRecipeBuilder(itemLookup, mainResult, count, cookingTime, experience, container);
     }
 
     public BnCCookingPotRecipeBuilder addIngredient(TagKey<Item> tagIn) {
-        return addIngredient(Ingredient.of(tagIn));
+        return addIngredient(Ingredient.of(itemLookup.getOrThrow(tagIn)));
     }
 
     public BnCCookingPotRecipeBuilder addIngredient(ItemLike itemIn) {
@@ -108,17 +115,18 @@ public class BnCCookingPotRecipeBuilder{
     }
 
     public void build(RecipeOutput output, Identifier id) {
+        ResourceKey<Recipe<?>> recipeKey = ResourceKey.create(Registries.RECIPE, id);
         Identifier advancementId = id.withPath(path -> "recipes/" + path);
+        
         AdvancementHolder builtAdvancement = advancement.build(advancementId);
         if (!builtAdvancement.value().criteria().isEmpty()) {
-            advancement.parent(Identifier.withDefaultNamespace("recipes/root")).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-                    .rewards(AdvancementRewards.Builder.recipe(id))
+            advancement.parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeKey))
+                    .rewards(AdvancementRewards.Builder.recipe(recipeKey))
                     .requirements(AdvancementRequirements.Strategy.OR);
-            advancement.rewards(AdvancementRewards.Builder.recipe(id));
             builtAdvancement = advancement.build(advancementId);
         } else
             builtAdvancement = null;
-        output.accept(id, new CookingPotRecipe("", tab, ingredients, result, container,  experience, cookingTime), builtAdvancement);
+        output.accept(recipeKey, new CookingPotRecipe("", tab, ingredients, result, container,  experience, cookingTime), builtAdvancement);
     }
 
 }

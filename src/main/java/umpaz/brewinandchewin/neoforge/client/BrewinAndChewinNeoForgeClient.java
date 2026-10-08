@@ -1,15 +1,17 @@
 package umpaz.brewinandchewin.neoforge.client;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.*;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import umpaz.brewinandchewin.client.BnCClientSetup;
@@ -17,16 +19,14 @@ import umpaz.brewinandchewin.client.BrewinAndChewinClient;
 import umpaz.brewinandchewin.client.gui.AgingCaskScreen;
 import umpaz.brewinandchewin.client.gui.KegScreen;
 import umpaz.brewinandchewin.client.gui.KegTooltip;
+import umpaz.brewinandchewin.client.particle.DrunkBubbleParticle;
+import umpaz.brewinandchewin.client.particle.RagingParticle;
+import umpaz.brewinandchewin.common.registry.BnCFluids;
 import umpaz.brewinandchewin.common.registry.BnCMenuTypes;
-import umpaz.brewinandchewin.neoforge.client.gui.BnCHUDOverlays;
+import umpaz.brewinandchewin.common.registry.BnCParticleTypes;
 import umpaz.brewinandchewin.BrewinAndChewin;
-import umpaz.brewinandchewin.client.renderer.CoasterBlockEntityRenderer;
 import umpaz.brewinandchewin.common.fluid.BnCFluidConstants;
 import umpaz.brewinandchewin.neoforge.client.platform.BnCClientPlatfomHelperNeoForge;
-import umpaz.brewinandchewin.neoforge.registry.BnCFluidTypes;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Mod(value = BrewinAndChewin.MODID, dist = Dist.CLIENT)
 public class BrewinAndChewinNeoForgeClient {
@@ -34,7 +34,6 @@ public class BrewinAndChewinNeoForgeClient {
         BrewinAndChewinClient.init(new BnCClientPlatfomHelperNeoForge());
         // 26.1 dropped EventBusSubscriber.Bus, so the mod-bus client handlers are registered here.
         eventBus.register(ModEvents.class);
-        BnCHUDOverlays.init(eventBus);
         BrewinAndChewin.isClient = true;
     }
 
@@ -55,121 +54,77 @@ public class BrewinAndChewinNeoForgeClient {
 
         @SubscribeEvent
         public static void registerItemProperties(FMLClientSetupEvent event) {
-            event.enqueueWork(BnCClientSetup::registerItemProperties);
+            // 26.1 replaced ItemProperties/ClampedItemPropertyFunction with registry-backed item
+            // models and JSON tint_sources, so there is nothing to register here yet.
         }
 
+        // 26.1 moved fluid textures and tint off IClientFluidTypeExtensions onto baked FluidModels.
         @SubscribeEvent
-        public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
-            event.registerFluidType(createHoneyExtension(BnCFluidConstants.Colors.DEFAULT), BnCFluidTypes.HONEY);
+        public static void registerFluidModels(RegisterFluidModelsEvent event) {
+            registerAlcohol(event, BnCFluids.BEER, BnCFluids.FLOWING_BEER, BnCFluidConstants.Colors.BEER);
+            registerAlcohol(event, BnCFluids.VODKA, BnCFluids.FLOWING_VODKA, BnCFluidConstants.Colors.VODKA);
+            registerAlcohol(event, BnCFluids.EGG_GROG, BnCFluids.FLOWING_EGG_GROG, BnCFluidConstants.Colors.EGG_GROG);
+            registerAlcohol(event, BnCFluids.STRONGROOT_ALE, BnCFluids.FLOWING_STRONGROOT_ALE, BnCFluidConstants.Colors.STRONGROOT_ALE);
+            registerAlcohol(event, BnCFluids.RICE_WINE, BnCFluids.FLOWING_RICE_WINE, BnCFluidConstants.Colors.RICE_WINE);
+            registerAlcohol(event, BnCFluids.GLITTERING_GRENADINE, BnCFluids.FLOWING_GLITTERING_GRENADINE, BnCFluidConstants.Colors.GLITTERING_GRENADINE);
+            registerAlcohol(event, BnCFluids.STEEL_TOE_STOUT, BnCFluids.FLOWING_STEEL_TOE_STOUT, BnCFluidConstants.Colors.STEEL_TOE_STOUT);
+            registerAlcohol(event, BnCFluids.DREAD_NOG, BnCFluids.FLOWING_DREAD_NOG, BnCFluidConstants.Colors.DREAD_NOG);
+            registerAlcohol(event, BnCFluids.KOMBUCHA, BnCFluids.FLOWING_KOMBUCHA, BnCFluidConstants.Colors.KOMBUCHA);
+            registerAlcohol(event, BnCFluids.SACCHARINE_RUM, BnCFluids.FLOWING_SACCHARINE_RUM, BnCFluidConstants.Colors.SACCHARINE_RUM);
+            registerAlcohol(event, BnCFluids.PALE_JANE, BnCFluids.FLOWING_PALE_JANE, BnCFluidConstants.Colors.PALE_JANE);
+            registerAlcohol(event, BnCFluids.SALTY_FOLLY, BnCFluids.FLOWING_SALTY_FOLLY, BnCFluidConstants.Colors.SALTY_FOLLY);
+            registerAlcohol(event, BnCFluids.BLOODY_MARY, BnCFluids.FLOWING_BLOODY_MARY, BnCFluidConstants.Colors.BLOODY_MARY);
+            registerAlcohol(event, BnCFluids.RED_RUM, BnCFluids.FLOWING_RED_RUM, BnCFluidConstants.Colors.RED_RUM);
+            registerAlcohol(event, BnCFluids.WITHERING_DROSS, BnCFluids.FLOWING_WITHERING_DROSS, BnCFluidConstants.Colors.WITHERING_DROSS);
+            registerAlcohol(event, BnCFluids.RED_WINE, BnCFluids.FLOWING_RED_WINE, BnCFluidConstants.Colors.RED_WINE);
+            registerAlcohol(event, BnCFluids.WHITE_WINE, BnCFluids.FLOWING_WHITE_WINE, BnCFluidConstants.Colors.WHITE_WINE);
+            registerAlcohol(event, BnCFluids.CURRANT_WINE, BnCFluids.FLOWING_CURRANT_WINE, BnCFluidConstants.Colors.CURRANT_WINE);
+            registerAlcohol(event, BnCFluids.VERRUCA_WINE, BnCFluids.FLOWING_VERRUCA_WINE, BnCFluidConstants.Colors.VERRUCA_WINE);
+            registerAlcohol(event, BnCFluids.TWISTED_WINE, BnCFluids.FLOWING_TWISTED_WINE, BnCFluidConstants.Colors.TWISTED_WINE);
 
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.BEER), BnCFluidTypes.BEER);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.VODKA), BnCFluidTypes.VODKA);
-            event.registerFluidType(createHoneyExtension(BnCFluidConstants.Colors.MEAD), BnCFluidTypes.MEAD);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.EGG_GROG), BnCFluidTypes.EGG_GROG);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.STRONGROOT_ALE), BnCFluidTypes.STRONGROOT_ALE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.RICE_WINE), BnCFluidTypes.RICE_WINE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.GLITTERING_GRENADINE), BnCFluidTypes.GLITTERING_GRENADINE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.STEEL_TOE_STOUT), BnCFluidTypes.STEEL_TOE_STOUT);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.DREAD_NOG), BnCFluidTypes.DREAD_NOG);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.KOMBUCHA), BnCFluidTypes.KOMBUCHA);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.SACCHARINE_RUM), BnCFluidTypes.SACCHARINE_RUM);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.PALE_JANE), BnCFluidTypes.PALE_JANE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.SALTY_FOLLY), BnCFluidTypes.SALTY_FOLLY);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.BLOODY_MARY), BnCFluidTypes.BLOODY_MARY);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.RED_RUM), BnCFluidTypes.RED_RUM);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.WITHERING_DROSS), BnCFluidTypes.WITHERING_DROSS);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.RED_WINE), BnCFluidTypes.RED_WINE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.WHITE_WINE), BnCFluidTypes.WHITE_WINE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.CURRANT_WINE), BnCFluidTypes.CURRANT_WINE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.VERRUCA_WINE), BnCFluidTypes.VERRUCA_WINE);
-            event.registerFluidType(createAlcoholExtension(BnCFluidConstants.Colors.TWISTED_WINE), BnCFluidTypes.TWISTED_WINE);
+            registerHoney(event, BnCFluids.HONEY, BnCFluids.FLOWING_HONEY, BnCFluidConstants.Colors.DEFAULT);
+            registerHoney(event, BnCFluids.MEAD, BnCFluids.FLOWING_MEAD, BnCFluidConstants.Colors.MEAD);
 
-            event.registerFluidType(new IClientFluidTypeExtensions() {
-                @Override
-                public Identifier getStillTexture() {
-                    return BnCFluidConstants.Textures.FLAXEN_STILL_TEXTURE;
-                }
-
-                @Override
-                public Identifier getFlowingTexture() {
-                    return BnCFluidConstants.Textures.FLAXEN_FLOWING_TEXTURE;
-                }
-            }, BnCFluidTypes.FLAXEN_CHEESE);
-            event.registerFluidType(new IClientFluidTypeExtensions() {
-                @Override
-                public Identifier getStillTexture() {
-                    return BnCFluidConstants.Textures.SCARLET_STILL_TEXTURE;
-                }
-
-                @Override
-                public Identifier getFlowingTexture() {
-                    return BnCFluidConstants.Textures.SCARLET_FLOWING_TEXTURE;
-                }
-            }, BnCFluidTypes.SCARLET_CHEESE);
+            event.register(new FluidModel.Unbaked(
+                    new Material(BnCFluidConstants.Textures.FLAXEN_STILL_TEXTURE),
+                    new Material(BnCFluidConstants.Textures.FLAXEN_FLOWING_TEXTURE),
+                    null,
+                    FluidTintSources.constant(BnCFluidConstants.Colors.DEFAULT)), BnCFluids.FLAXEN_CHEESE, BnCFluids.FLOWING_FLAXEN_CHEESE);
+            event.register(new FluidModel.Unbaked(
+                    new Material(BnCFluidConstants.Textures.SCARLET_STILL_TEXTURE),
+                    new Material(BnCFluidConstants.Textures.SCARLET_FLOWING_TEXTURE),
+                    null,
+                    FluidTintSources.constant(BnCFluidConstants.Colors.DEFAULT)), BnCFluids.SCARLET_CHEESE, BnCFluids.FLOWING_SCARLET_CHEESE);
         }
 
-        private static IClientFluidTypeExtensions createHoneyExtension(int color) {
-            return new IClientFluidTypeExtensions() {
-                @Override
-                public Identifier getStillTexture() {
-                    return BnCFluidConstants.Textures.HONEY_FLUID_STILL_TEXTURE;
-                }
-
-                @Override
-                public Identifier getFlowingTexture() {
-                    return BnCFluidConstants.Textures.HONEY_FLUID_FLOWING_TEXTURE;
-                }
-
-                @Override
-                public int getTintColor() {
-                    return color;
-                }
-            };
+        private static void registerAlcohol(RegisterFluidModelsEvent event, net.minecraft.world.level.material.FlowingFluid still, net.minecraft.world.level.material.FlowingFluid flowing, int color) {
+            event.register(new FluidModel.Unbaked(
+                    new Material(BnCFluidConstants.Textures.FLUID_STILL_TEXTURE),
+                    new Material(BnCFluidConstants.Textures.FLUID_FLOWING_TEXTURE),
+                    null,
+                    FluidTintSources.constant(color)), still, flowing);
         }
 
-        private static IClientFluidTypeExtensions createAlcoholExtension(int color) {
-            return new IClientFluidTypeExtensions() {
-                @Override
-                public Identifier getStillTexture() {
-                    return BnCFluidConstants.Textures.FLUID_STILL_TEXTURE;
-                }
-
-                @Override
-                public Identifier getFlowingTexture() {
-                    return BnCFluidConstants.Textures.FLUID_FLOWING_TEXTURE;
-                }
-
-                @Override
-                public int getTintColor() {
-                    return color;
-                }
-            };
-        }
-
-        private static final List<Identifier> MODELS = new ArrayList<>();
-
-        @SubscribeEvent
-        public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-            BnCClientSetup.registerBlockEntityRenderers(event::registerBlockEntityRenderer);
+        private static void registerHoney(RegisterFluidModelsEvent event, net.minecraft.world.level.material.FlowingFluid still, net.minecraft.world.level.material.FlowingFluid flowing, int color) {
+            event.register(new FluidModel.Unbaked(
+                    new Material(BnCFluidConstants.Textures.HONEY_FLUID_STILL_TEXTURE),
+                    new Material(BnCFluidConstants.Textures.HONEY_FLUID_FLOWING_TEXTURE),
+                    null,
+                    FluidTintSources.constant(color)), still, flowing);
         }
 
         @SubscribeEvent
         public static void registerParticles(RegisterParticleProvidersEvent event) {
-            BnCClientSetup.registerParticles(event::registerSpriteSet);
+            event.registerSpriteSet(BnCParticleTypes.DRUNK_BUBBLE, DrunkBubbleParticle.Factory::new);
+            event.registerSpriteSet(BnCParticleTypes.RAGING_STAGE_1, RagingParticle.Factory::new);
+            event.registerSpriteSet(BnCParticleTypes.RAGING_STAGE_2, RagingParticle.Factory::new);
+            event.registerSpriteSet(BnCParticleTypes.RAGING_STAGE_3, RagingParticle.Factory::new);
+            event.registerSpriteSet(BnCParticleTypes.RAGING_STAGE_4, RagingParticle.Factory::new);
         }
 
         @SubscribeEvent
         public static void registerKegTooltipComponents(RegisterClientTooltipComponentFactoriesEvent event) {
             event.register(KegTooltip.KegTooltipComponent.class, KegTooltip::new);
         }
-
-        @SubscribeEvent
-        public static void registerReloadListeners(AddClientReloadListenersEvent event) {
-            BnCClientSetup.registerReloadListeners(event::addListener);
-        }
-
-        // NOTE(26.1): the coaster's dynamic wrapped model relied on BakedModel/
-        // ModelBakery/ModelResourceLocation, all removed in 26.1. It needs a rewrite onto
-        // BlockStateModel/ItemModel before it can come back; see bac-26.1-status.md.
     }
 }

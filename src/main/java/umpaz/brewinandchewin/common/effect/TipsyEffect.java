@@ -6,6 +6,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import org.joml.Vector3f;
 import umpaz.brewinandchewin.client.particle.DrunkBubbleParticleOptions;
+import net.minecraft.server.level.ServerLevel;
 
 public class TipsyEffect extends MobEffect {
     public static final int FREEZE_IMMUNITY_AMPLIFIER = 2;
@@ -24,7 +25,7 @@ public class TipsyEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
         if (amplifier >= FREEZE_IMMUNITY_AMPLIFIER && entity.getTicksFrozen() > 0)
             entity.setTicksFrozen(0);
         return true;

@@ -4,12 +4,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
@@ -28,6 +26,11 @@ import umpaz.brewinandchewin.common.world.BnCBiomeFeatures;
 
 import java.util.List;
 
+/**
+ * 26.1 removed Feature#RANDOM_PATCH / RandomPatchConfiguration, so the wild corn patch is now a
+ * plain simple_block configured feature and the "patch" behaviour comes from the placed feature's
+ * rarity + in-square spread radius (the same shape vanilla uses for FLOWER_* after the removal).
+ */
 public class BnCWildCropGeneration {
     public static final ResourceKey<BiomeModifier> ADD_WILD_CORN =
             ResourceKey.create(NeoForgeRegistries.Keys.BIOME_MODIFIERS, BrewinAndChewin.asResource("add_wild_corn"));
@@ -35,10 +38,8 @@ public class BnCWildCropGeneration {
             ResourceKey.create(NeoForgeRegistries.Keys.BIOME_MODIFIERS, BrewinAndChewin.asResource("add_wild_grapes"));
 
     public static void bootstrapConfiguredFeatures(BootstrapContext<ConfiguredFeature<?, ?>> context) {
-        context.register(BnCBiomeFeatures.PATCH_WILD_CORN, new ConfiguredFeature<>(Feature.RANDOM_PATCH,
-                new RandomPatchConfiguration(BnCBiomeFeatures.WILD_CORN_TRIES, 6, 2,
-                        PlacementUtils.onlyWhenEmpty(Feature.SIMPLE_BLOCK,
-                                new SimpleBlockConfiguration(BlockStateProvider.simple(BnCBlocks.WILD_CORN))))));
+        context.register(BnCBiomeFeatures.PATCH_WILD_CORN, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK,
+                new SimpleBlockConfiguration(BlockStateProvider.simple(BnCBlocks.WILD_CORN))));
         context.register(BnCBiomeFeatures.PATCH_WILD_GRAPES,
                 new ConfiguredFeature<>(BnCFeatures.WILD_GRAPES, NoneFeatureConfiguration.INSTANCE));
     }

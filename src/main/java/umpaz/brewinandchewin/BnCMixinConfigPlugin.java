@@ -22,7 +22,7 @@ public class BnCMixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains(".integration."))
-            return FMLLoader.getLoadingModList().getModFileById(mixinClassName.split(".integration.", 2)[1].split("\\.", 2)[0]) != null;
+            return net.neoforged.fml.loading.LoadingModList.get().getModFileById(mixinClassName.split(".integration.", 2)[1].split("\\.", 2)[0]) != null;
         return true;
     }
 

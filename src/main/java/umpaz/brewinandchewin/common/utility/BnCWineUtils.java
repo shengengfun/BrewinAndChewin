@@ -50,12 +50,12 @@ public class BnCWineUtils {
         Optional<ResourceKey<Potion>> key = potion.unwrapKey();
         if (key.isEmpty())
             return potion;
-        String path = key.get().location().getPath();
+        String path = key.get().identifier().getPath();
         for (String prefix : POTION_STRENGTH_PREFIXES) {
             if (!path.startsWith(prefix))
                 continue;
-            Optional<Holder.Reference<Potion>> base = BuiltInRegistries.POTION.getHolder(
-                    ResourceKey.create(Registries.POTION, key.get().location().withPath(path.substring(prefix.length()))));
+            Optional<Holder.Reference<Potion>> base = BuiltInRegistries.POTION.get(
+                    ResourceKey.create(Registries.POTION, key.get().identifier().withPath(path.substring(prefix.length()))));
             if (base.isPresent())
                 return base.get();
         }
@@ -235,7 +235,7 @@ public class BnCWineUtils {
     }
 
     private static Optional<Holder<MobEffect>> getRandomEffect(TagKey<MobEffect> tag, RandomSource random) {
-        Optional<HolderSet.Named<MobEffect>> holders = BuiltInRegistries.MOB_EFFECT.getTag(tag);
+        Optional<HolderSet.Named<MobEffect>> holders = BuiltInRegistries.MOB_EFFECT.get(tag);
         if (holders.isEmpty() || holders.get().size() == 0)
             return Optional.empty();
         return holders.get().getRandomElement(random);

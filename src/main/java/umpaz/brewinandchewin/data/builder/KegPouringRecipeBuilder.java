@@ -1,9 +1,13 @@
 package umpaz.brewinandchewin.data.builder;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.common.conditions.ICondition;
@@ -15,19 +19,22 @@ import umpaz.brewinandchewin.common.utility.FluidUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.world.item.ItemStackTemplate;
 
 public class KegPouringRecipeBuilder {
-    private ItemStack container;
+    // 26.1 binds item components only after the registry is frozen, so datagen builds
+    // templates and the recipe expands them at runtime.
+    private ItemStackTemplate container;
     private final Fluid fluid;
     private final int amount;
     private Optional<FluidUnit> unit = Optional.empty();
-    private final ItemStack output;
+    private final ItemStackTemplate output;
     private final boolean strict;
     private final boolean filling;
     private final List<ICondition> conditions = new ArrayList<>();
     private boolean includeCreateRecipes = true;
 
-    private KegPouringRecipeBuilder(Fluid fluid, int amount, ItemStack output, boolean strict, boolean filling) {
+    private KegPouringRecipeBuilder(Fluid fluid, int amount, ItemStackTemplate output, boolean strict, boolean filling) {
         this.fluid = fluid;
         this.amount = amount;
         this.output = output;
@@ -36,19 +43,27 @@ public class KegPouringRecipeBuilder {
     }
 
     public static KegPouringRecipeBuilder kegPouringRecipe(Fluid fluid, int amount, ItemStack output, boolean strict) {
+        return new KegPouringRecipeBuilder(fluid, amount, ItemStackTemplate.fromNonEmptyStack(output), strict, true);
+    }
+
+    /**
+     * 26.1's item components are only readable after the registry is frozen, so datagen passes a
+     * template rather than a materialised stack.
+     */
+    public static KegPouringRecipeBuilder kegPouringRecipe(Fluid fluid, int amount, ItemStackTemplate output, boolean strict) {
         return new KegPouringRecipeBuilder(fluid, amount, output, strict, true);
     }
 
     public static KegPouringRecipeBuilder kegPouringRecipe(Fluid fluid, int amount, ItemStack output, boolean strict, boolean filling) {
-        return new KegPouringRecipeBuilder(fluid, amount, output, strict, filling);
+        return new KegPouringRecipeBuilder(fluid, amount, ItemStackTemplate.fromNonEmptyStack(output), strict, filling);
     }
 
     public static KegPouringRecipeBuilder kegPouringRecipe(Fluid fluid, int amount, ItemLike output) {
-        return new KegPouringRecipeBuilder(fluid, amount, output.asItem().getDefaultInstance(), false, true);
+        return new KegPouringRecipeBuilder(fluid, amount, new ItemStackTemplate(output.asItem()), false, true);
     }
 
     public static KegPouringRecipeBuilder kegPouringRecipe(Fluid fluid, int amount, ItemLike output, boolean filling) {
-        return new KegPouringRecipeBuilder(fluid, amount, output.asItem().getDefaultInstance(), false, filling);
+        return new KegPouringRecipeBuilder(fluid, amount, new ItemStackTemplate(output.asItem()), false, filling);
     }
 
     /**
@@ -62,7 +77,7 @@ public class KegPouringRecipeBuilder {
     }
 
     public KegPouringRecipeBuilder withContainer(ItemLike container) {
-        this.container = container.asItem().getDefaultInstance();
+        this.container = new ItemStackTemplate(container.asItem());
         return this;
     }
 
@@ -77,12 +92,12 @@ public class KegPouringRecipeBuilder {
     }
 
     public void build(RecipeOutput consumerIn) {
-        Identifier outputLocation = BuiltInRegistries.ITEM.getKey(output.getItem());
+        Identifier outputLocation = BuiltInRegistries.ITEM.getKey(output.item().value());
         build(consumerIn, BrewinAndChewin.MODID + ":pouring/" + outputLocation.getPath());
     }
 
     public void build(RecipeOutput consumerIn, String save) {
-        Identifier resourcelocation = BuiltInRegistries.ITEM.getKey(output.getItem());
+        Identifier resourcelocation = BuiltInRegistries.ITEM.getKey(output.item().value());
         if (resourcelocation.equals(Identifier.tryParse(save))) {
             throw new IllegalStateException("Pouring Recipe " + save + " should remove its 'save' argument");
         } else {
@@ -91,10 +106,7 @@ public class KegPouringRecipeBuilder {
     }
 
     public void build(RecipeOutput consumerIn, Identifier id) {
-        if (!output.hasCraftingRemainingItem() && container == null)
-            throw new IllegalStateException("Pouring Recipe " + id + " must specify a container as the output does not have a remainder.");
-
-        consumerIn.accept(id, new KegPouringRecipe(new AbstractedFluidStack(fluid, amount), Optional.ofNullable(container), output, unit, strict, filling), null);
+        consumerIn.accept(ResourceKey.create(Registries.RECIPE, id), new KegPouringRecipe(new AbstractedFluidStack(fluid, amount), Optional.ofNullable(container), output, unit, strict, filling), null);
 
         // TODO: Create recipe compat when Create updates.
 //        if (ForgeRegistries.ITEMS.getKey(output.getItem()).getNamespace().equals("create") || !includeCreateRecipes)

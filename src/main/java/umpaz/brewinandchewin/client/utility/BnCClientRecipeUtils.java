@@ -17,13 +17,8 @@ public class BnCClientRecipeUtils {
         if (fluid.isEmpty() || Minecraft.getInstance().level == null)
             return ItemStack.EMPTY;
         RegistryAccess registryAccess = Minecraft.getInstance().level.registryAccess();
-        ItemStack itemDisplay = BnCFluidItemDisplays.getFluidItemDisplay(registryAccess, fluid);
-
-        if (!itemDisplay.isEmpty())
-            return itemDisplay;
-
-        RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-        Optional<KegPouringRecipe> recipe = recipeManager.getAllRecipesFor(BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> kegPouringRecipe.getRawFluid().matches(fluid)).findFirst();
-        return recipe.map(KegPouringRecipe::getOutput).orElse(ItemStack.EMPTY);
+        RecipeManager recipeManager = (RecipeManager) Minecraft.getInstance().level.recipeAccess();
+        Optional<KegPouringRecipe> recipe = umpaz.brewinandchewin.common.utility.BnCRecipeLookup.all(recipeManager, BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> kegPouringRecipe.getRawFluid().matches(fluid)).findFirst();
+        return recipe.map(kegPouringRecipe -> kegPouringRecipe.getOutput().create()).orElse(ItemStack.EMPTY);
     }
 }

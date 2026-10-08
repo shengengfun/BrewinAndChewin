@@ -2,7 +2,6 @@ package umpaz.brewinandchewin.common.loot.function;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -18,6 +17,9 @@ import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.block.entity.KegBlockEntity;
 
 import java.util.List;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import umpaz.brewinandchewin.common.registry.BnCBlockEntityTypes;
 
 public class CopyDrinkFunction extends LootItemConditionalFunction
 {
@@ -38,11 +40,10 @@ public class CopyDrinkFunction extends LootItemConditionalFunction
     protected ItemStack run(ItemStack stack, LootContext context) {
         BlockEntity tile = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (tile instanceof KegBlockEntity kegTile) {
-            CompoundTag tag = kegTile.writeDrink(stack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY).copyTag(), context.getLevel().registryAccess());
-            CustomData data = CustomData.of(tag);
-            if (!tag.isEmpty()) {
-                stack.set(DataComponents.BLOCK_ENTITY_DATA, data);
-            }
+            TypedEntityData<BlockEntityType<?>> existing = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+            CompoundTag tag = kegTile.writeDrink(existing == null ? new CompoundTag() : existing.copyTagWithoutId(), context.getLevel().registryAccess());
+            if (!tag.isEmpty())
+                stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(BnCBlockEntityTypes.KEG, tag));
         }
         return stack;
     }

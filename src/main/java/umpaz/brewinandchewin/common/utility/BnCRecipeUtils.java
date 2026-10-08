@@ -22,6 +22,6 @@ public class BnCRecipeUtils {
         if (server == null)
             return ItemStack.EMPTY;
         Optional<KegPouringRecipe> recipe = BnCRecipeLookup.all(BnCRecipeLookup.manager(server), BnCRecipeTypes.KEG_POURING).stream().map(RecipeHolder::value).sorted(Comparator.comparing(KegPouringRecipe::isStrict)).filter(kegPouringRecipe -> kegPouringRecipe.getRawFluid().matches(fluid)).findFirst();
-        return recipe.map(KegPouringRecipe::getOutput).orElse(ItemStack.EMPTY);
+        return recipe.map(kegPouringRecipe -> kegPouringRecipe.getOutput().create()).orElse(ItemStack.EMPTY);
     }
 }

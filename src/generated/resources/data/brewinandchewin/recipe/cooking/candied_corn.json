@@ -3,15 +3,10 @@
   "cookingtime": 100,
   "experience": 0.35,
   "ingredients": [
-    {
-      "item": "brewinandchewin:corn_kernels"
-    },
-    {
-      "item": "minecraft:sugar"
-    }
+    "brewinandchewin:corn_kernels",
+    "minecraft:sugar"
   ],
   "result": {
-    "count": 1,
     "id": "brewinandchewin:candied_corn"
   }
 }

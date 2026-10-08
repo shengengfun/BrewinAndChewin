@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:bread"
-    },
-    {
-      "tag": "brewinandchewin:jams"
-    },
-    {
-      "item": "minecraft:bread"
-    }
+    "minecraft:bread",
+    "#brewinandchewin:jams",
+    "minecraft:bread"
   ],
   "result": {
     "count": 2,

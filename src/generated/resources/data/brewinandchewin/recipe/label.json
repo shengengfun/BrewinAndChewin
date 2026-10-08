@@ -2,18 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:paper"
-    },
-    {
-      "item": "minecraft:paper"
-    },
-    {
-      "item": "minecraft:paper"
-    },
-    {
-      "item": "minecraft:honeycomb"
-    }
+    "minecraft:paper",
+    "minecraft:paper",
+    "minecraft:paper",
+    "minecraft:honeycomb"
   ],
   "result": {
     "count": 3,

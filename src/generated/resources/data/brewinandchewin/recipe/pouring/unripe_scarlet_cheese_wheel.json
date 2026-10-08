@@ -2,7 +2,6 @@
   "type": "brewinandchewin:keg_pouring",
   "can_fill": false,
   "container": {
-    "count": 1,
     "id": "minecraft:honeycomb"
   },
   "fluid": {
@@ -10,7 +9,6 @@
     "id": "brewinandchewin:scarlet_cheese"
   },
   "output": {
-    "count": 1,
     "id": "brewinandchewin:unripe_scarlet_cheese_wheel"
   },
   "unit": "millibuckets"

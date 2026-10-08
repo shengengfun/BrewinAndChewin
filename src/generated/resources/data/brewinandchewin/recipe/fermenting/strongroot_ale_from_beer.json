@@ -9,18 +9,10 @@
   },
   "experience": 1.0,
   "ingredients": [
-    {
-      "tag": "c:crops/beetroot"
-    },
-    {
-      "tag": "c:crops/potato"
-    },
-    {
-      "item": "minecraft:brown_mushroom"
-    },
-    {
-      "item": "brewinandchewin:jerky"
-    }
+    "#c:crops/beetroot",
+    "#c:crops/potato",
+    "minecraft:brown_mushroom",
+    "brewinandchewin:jerky"
   ],
   "result": {
     "amount": 1000,

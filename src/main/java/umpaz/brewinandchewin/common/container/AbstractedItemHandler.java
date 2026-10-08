@@ -3,8 +3,10 @@ package umpaz.brewinandchewin.common.container;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
+import umpaz.brewinandchewin.common.utility.BnCValueIO;
 
-public interface AbstractedItemHandler {
+public interface AbstractedItemHandler extends ValueIOSerializable {
     int getSlotCount();
 
     ItemStack getStackInSlot(int slot);
@@ -15,8 +17,17 @@ public interface AbstractedItemHandler {
     boolean isItemValid(int slot, ItemStack stack);
     int getSlotLimit(int slot);
 
-    default void readFromNbt(CompoundTag tag, HolderLookup.Provider provider) {}
+    @Override
+    default void serialize(net.minecraft.world.level.storage.ValueOutput output) {}
+
+    @Override
+    default void deserialize(net.minecraft.world.level.storage.ValueInput input) {}
+
+    default void readFromNbt(CompoundTag tag, HolderLookup.Provider provider) {
+        deserialize(BnCValueIO.input(provider, tag));
+    }
+
     default CompoundTag writeToNbt(HolderLookup.Provider provider) {
-        return new CompoundTag();
+        return BnCValueIO.write(this, provider);
     }
 }

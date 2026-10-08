@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "d": {
-      "item": "brewinandchewin:corn_dough"
-    },
-    "e": {
-      "tag": "c:eggs"
-    }
+    "d": "brewinandchewin:corn_dough",
+    "e": "#c:eggs"
   },
   "pattern": [
     "ddd",

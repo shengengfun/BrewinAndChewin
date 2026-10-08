@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "d": {
-      "item": "farmersdelight:wheat_dough"
-    },
-    "e": {
-      "tag": "c:eggs"
-    }
+    "d": "farmersdelight:wheat_dough",
+    "e": "#c:eggs"
   },
   "pattern": [
     "ddd",

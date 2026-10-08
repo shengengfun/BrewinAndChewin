@@ -16,6 +16,10 @@ import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.block.entity.KegBlockEntity;
 
 import java.util.List;
+import net.minecraft.world.item.component.TypedEntityData;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import umpaz.brewinandchewin.common.registry.BnCBlockEntityTypes;
+import net.minecraft.nbt.CompoundTag;
 
 public class BnCCopyMealFunction extends LootItemConditionalFunction {
     public static final MapCodec<BnCCopyMealFunction> CODEC = RecordCodecBuilder.mapCodec(inst ->
@@ -35,8 +39,9 @@ public class BnCCopyMealFunction extends LootItemConditionalFunction {
     protected ItemStack run(ItemStack stack, LootContext context) {
         BlockEntity tile = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (tile instanceof KegBlockEntity kegTile) {
-            CustomData data = kegTile.writeMeal(stack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY).copyTag(), context.getLevel().registryAccess());
-            stack.set(DataComponents.BLOCK_ENTITY_DATA, data);
+            TypedEntityData<BlockEntityType<?>> existing = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+            CustomData data = kegTile.writeMeal(existing == null ? new CompoundTag() : existing.copyTagWithoutId(), context.getLevel().registryAccess());
+            stack.set(DataComponents.BLOCK_ENTITY_DATA, TypedEntityData.of(BnCBlockEntityTypes.KEG, data.copyTag()));
         }
         return stack;
     }

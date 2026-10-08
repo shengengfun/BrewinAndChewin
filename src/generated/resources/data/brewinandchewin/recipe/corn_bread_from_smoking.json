@@ -3,11 +3,8 @@
   "category": "food",
   "cookingtime": 100,
   "experience": 0.35,
-  "ingredient": {
-    "item": "brewinandchewin:corn_dough"
-  },
+  "ingredient": "brewinandchewin:corn_dough",
   "result": {
-    "count": 1,
     "id": "brewinandchewin:corn_bread"
   }
 }

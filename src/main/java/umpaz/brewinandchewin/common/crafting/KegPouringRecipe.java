@@ -9,6 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.component.UseRemainder;
 import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.level.Level;
 import umpaz.brewinandchewin.BrewinAndChewin;
@@ -22,18 +23,19 @@ import umpaz.brewinandchewin.common.utility.KegRecipeWrapper;
 
 import java.util.Objects;
 import java.util.Optional;
+import net.minecraft.world.item.ItemStackTemplate;
 
 public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
     private final AbstractedFluidStack fluid;
-    private final Optional<ItemStack> container;
-    private final ItemStack output;
+    // 26.1 binds item components only after the registry is frozen, so the recipe keeps
+    // templates and expands them on demand.
+    private final Optional<ItemStackTemplate> container;
+    private final ItemStackTemplate output;
     private final Optional<FluidUnit> unit;
     private final boolean strict;
     private final boolean filling;
 
-    public KegPouringRecipe(AbstractedFluidStack fluid, Optional<ItemStack> container, ItemStack output, Optional<FluidUnit> unit, boolean strict, boolean filling) {
-        if (container.isEmpty() && BrewinAndChewin.getHelper().getCraftingRemainingItem(output).isEmpty())
-            throw new UnsupportedOperationException("'container' field must be specified as the output item stack doesn't have a crafting remainder item.");
+    public KegPouringRecipe(AbstractedFluidStack fluid, Optional<ItemStackTemplate> container, ItemStackTemplate output, Optional<FluidUnit> unit, boolean strict, boolean filling) {
         this.fluid = fluid;
         this.container = container;
         this.output = output;
@@ -44,26 +46,34 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
 
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> ingredient = NonNullList.create();
-        ingredient.add(Ingredient.of(getContainer()));
+        ingredient.add(Ingredient.of(getContainer().getItem()));
         return ingredient;
     }
 
     @Override
     public boolean matches(KegRecipeWrapper inv, Level level) {
-        return Ingredient.of(getContainer()).test(inv.getItem(4));
+        return Ingredient.of(getContainer().getItem()).test(inv.getItem(4));
     }
 
     @Override
     public ItemStack assemble(KegRecipeWrapper recipeWrapper) {
-        return this.output.copy();
+        return this.output.create();
     }
 
     public ItemStack getContainer() {
-        return this.container.orElse(BrewinAndChewin.getHelper().getCraftingRemainingItem(output));
+        if (this.container.isEmpty()) {
+            ItemStack remainder = remainderOf(output);
+            // Item components are only readable once the registry is frozen, so this guard lives
+            // here rather than in the constructor - see KegPouringRecipeBuilder.
+            if (remainder.isEmpty())
+                throw new UnsupportedOperationException("'container' field must be specified as the output item stack doesn't have a crafting remainder item.");
+            return remainder;
+        }
+        return this.container.get().create();
     }
 
     public ItemStack getContainer(ItemStack stack) {
-        return this.container.orElse(BrewinAndChewin.getHelper().getCraftingRemainingItem(stack));
+        return this.container.map(ItemStackTemplate::create).orElse(BrewinAndChewin.getHelper().getCraftingRemainingItem(stack));
     }
 
     public Optional<FluidUnit> getRawUnit() {
@@ -78,16 +88,21 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
         return getUnit().convertToLoader(fluid.amount());
     }
 
-    public Optional<ItemStack> getRawContainer(){
+    private static ItemStack remainderOf(ItemStackTemplate template) {
+        UseRemainder remainder = template.get(net.minecraft.core.component.DataComponents.USE_REMAINDER);
+        return remainder == null ? ItemStack.EMPTY : remainder.convertInto().create();
+    }
+
+    public Optional<ItemStackTemplate> getRawContainer(){
         return this.container;
     }
 
-    public ItemStack getOutput(){
+    public ItemStackTemplate getOutput(){
         return this.output;
     }
 
     public ItemStack getResultItem() {
-        return this.output;
+        return this.output.create();
     }
 
     public AbstractedFluidStack getFluid(ItemStack container) {
@@ -166,18 +181,22 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
         return filling == that.filling;
     }
 
-    public static class Serializer implements RecipeSerializer<KegPouringRecipe> {
+    /**
+     * 26.1 turned RecipeSerializer into a record holding (MapCodec, StreamCodec), so this is now
+     * just a codec holder rather than a RecipeSerializer implementation - see BnCRecipeSerializers.
+     */
+    public static final class Serializer {
         public static final MapCodec<KegPouringRecipe> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
                 AbstractedFluidStack.CODEC.fieldOf("fluid").forGetter(KegPouringRecipe::getRawFluid),
-                ItemStack.CODEC.optionalFieldOf("container").forGetter(KegPouringRecipe::getRawContainer),
-                ItemStack.CODEC.fieldOf("output").forGetter(KegPouringRecipe::getOutput),
+                ItemStackTemplate.CODEC.optionalFieldOf("container").forGetter(KegPouringRecipe::getRawContainer),
+                ItemStackTemplate.CODEC.fieldOf("output").forGetter(KegPouringRecipe::getOutput),
                 FluidUnit.CODEC.optionalFieldOf("unit").forGetter(KegPouringRecipe::getRawUnit),
                 Codec.BOOL.optionalFieldOf("strict", false).forGetter(KegPouringRecipe::isStrict),
                 Codec.BOOL.optionalFieldOf("can_fill", true).forGetter(KegPouringRecipe::canFill)
         ).apply(inst, KegPouringRecipe::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, KegPouringRecipe> STREAM_CODEC = StreamCodec.of(KegPouringRecipe.Serializer::toNetwork, KegPouringRecipe.Serializer::fromNetwork);
 
-        public Serializer() {}
+        private Serializer() {}
 
         public MapCodec<KegPouringRecipe> codec() {
             return CODEC;
@@ -189,8 +208,8 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
 
         public static void toNetwork(RegistryFriendlyByteBuf buf, KegPouringRecipe recipe) {
             AbstractedFluidStack.STREAM_CODEC.encode(buf, recipe.getRawFluid());
-            ByteBufCodecs.optional(ItemStack.STREAM_CODEC).encode(buf, recipe.getRawContainer());
-            ItemStack.STREAM_CODEC.encode(buf, recipe.getOutput());
+            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).encode(buf, recipe.getRawContainer());
+            ItemStackTemplate.STREAM_CODEC.encode(buf, recipe.getOutput());
             ByteBufCodecs.optional(FluidUnit.STREAM_CODEC).encode(buf, recipe.getRawUnit());
             ByteBufCodecs.BOOL.encode(buf, recipe.isStrict());
             ByteBufCodecs.BOOL.encode(buf, recipe.canFill());
@@ -198,8 +217,8 @@ public class KegPouringRecipe implements Recipe<KegRecipeWrapper> {
 
         public static KegPouringRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
             AbstractedFluidStack fluid = AbstractedFluidStack.STREAM_CODEC.decode(buf);
-            Optional<ItemStack> container = ByteBufCodecs.optional(ItemStack.STREAM_CODEC).decode(buf);
-            ItemStack output = ItemStack.STREAM_CODEC.decode(buf);
+            Optional<ItemStackTemplate> container = ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC).decode(buf);
+            ItemStackTemplate output = ItemStackTemplate.STREAM_CODEC.decode(buf);
             Optional<FluidUnit> unit = ByteBufCodecs.optional(FluidUnit.STREAM_CODEC).decode(buf);
             boolean strict = buf.readBoolean();
             boolean canFill = buf.readBoolean();

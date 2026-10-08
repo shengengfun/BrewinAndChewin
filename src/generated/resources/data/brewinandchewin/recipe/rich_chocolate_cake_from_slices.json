@@ -2,16 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "s": {
-      "item": "brewinandchewin:slice_of_rich_chocolate_cake"
-    }
+    "s": "brewinandchewin:slice_of_rich_chocolate_cake"
   },
   "pattern": [
     "sss",
     "sss"
   ],
   "result": {
-    "count": 1,
     "id": "brewinandchewin:rich_chocolate_cake"
   }
 }

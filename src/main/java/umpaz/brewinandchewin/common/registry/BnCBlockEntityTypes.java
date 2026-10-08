@@ -10,10 +10,10 @@ import umpaz.brewinandchewin.common.block.entity.CoasterBlockEntity;
 import umpaz.brewinandchewin.common.block.entity.KegBlockEntity;
 
 public class BnCBlockEntityTypes {
-    public static final BlockEntityType<KegBlockEntity> KEG = BlockEntityType.Builder.of(BrewinAndChewin.getHelper().supplyBlockEntity(), BnCBlocks.KEG).build(null);
-    public static final BlockEntityType<CoasterBlockEntity> COASTER = BlockEntityType.Builder.of(CoasterBlockEntity::new, BnCBlocks.COASTER).build(null);
-    public static final BlockEntityType<AgingCaskBlockEntity> AGING_CASK = BlockEntityType.Builder.of(BrewinAndChewin.getHelper().supplyAgingCaskBlockEntity(), BnCBlocks.AGING_CASK).build(null);
-    public static final BlockEntityType<BottleRackBlockEntity> BOTTLE_RACK = BlockEntityType.Builder.of(BottleRackBlockEntity::new, BnCBlocks.BOTTLE_RACK).build(null);
+    public static final BlockEntityType<KegBlockEntity> KEG = new BlockEntityType<>(BrewinAndChewin.getHelper().supplyBlockEntity(), BnCBlocks.KEG);
+    public static final BlockEntityType<CoasterBlockEntity> COASTER = new BlockEntityType<>(CoasterBlockEntity::new, BnCBlocks.COASTER);
+    public static final BlockEntityType<AgingCaskBlockEntity> AGING_CASK = new BlockEntityType<>(BrewinAndChewin.getHelper().supplyAgingCaskBlockEntity(), BnCBlocks.AGING_CASK);
+    public static final BlockEntityType<BottleRackBlockEntity> BOTTLE_RACK = new BlockEntityType<>(BottleRackBlockEntity::new, BnCBlocks.BOTTLE_RACK);
 
     public static void registerAll() {
         Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, BrewinAndChewin.asResource("keg"), KEG);

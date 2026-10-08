@@ -9,6 +9,8 @@ import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.world.BnCBiomeFeatures;
 
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 
 public class BnCBiomeTags extends BiomeTagsProvider {
     public BnCBiomeTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
@@ -19,7 +21,7 @@ public class BnCBiomeTags extends BiomeTagsProvider {
     protected void addTags(HolderLookup.Provider provider) {
         tag(BnCBiomeFeatures.HAS_WILD_CORN)
                 .addTag(Tags.Biomes.IS_PLAINS)
-                .addOptional(NMLIntegration.PRAIRIE);
+                .addOptional(ResourceKey.create(Registries.BIOME, NMLIntegration.PRAIRIE));
         tag(BnCBiomeFeatures.HAS_WILD_GRAPES)
                 .addTag(Tags.Biomes.IS_COLD)
                 .addTag(Tags.Biomes.IS_TEMPERATE);

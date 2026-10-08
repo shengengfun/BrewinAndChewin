@@ -19,10 +19,7 @@ public class IntoxicationAppleSkinCompatNeoForge {
             event.modifiedFoodProperties = new FoodProperties(
                     event.modifiedFoodProperties.nutrition(),
                     0.0F,
-                    event.modifiedFoodProperties.canAlwaysEat(),
-                    event.modifiedFoodProperties.eatSeconds(),
-                    event.modifiedFoodProperties.usingConvertsTo(),
-                    event.modifiedFoodProperties.effects()
+                    event.modifiedFoodProperties.canAlwaysEat()
             );
         }
     }

@@ -32,9 +32,10 @@ import org.jetbrains.annotations.Nullable;
 import umpaz.brewinandchewin.common.block.entity.CoasterBlockEntity;
 
 import java.util.List;
+import net.minecraft.server.level.ServerLevel;
 
 public class CoasterBlock extends BaseEntityBlock {
-    public static final MapCodec<CoasterBlock> CODEC = MapCodec.unit(CoasterBlock::new);
+    public static final MapCodec<CoasterBlock> CODEC = simpleCodec(CoasterBlock::new);
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
     public static final IntegerProperty SIZE = IntegerProperty.create("size", 0, 4);
     public static final BooleanProperty INVISIBLE = BooleanProperty.create("invisible");
@@ -42,8 +43,8 @@ public class CoasterBlock extends BaseEntityBlock {
     protected static final VoxelShape COASTER_SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 1.0D, 13.0D);
     protected static final VoxelShape TRAY_SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 1.0D, 15.0D);
 
-    public CoasterBlock() {
-        super(Properties.ofFullCopy(Blocks.BROWN_CARPET).sound(SoundType.WOOD).instabreak());
+    public CoasterBlock(Properties properties) {
+        super(properties.sound(SoundType.WOOD).instabreak());
         this.registerDefaultState(this.getStateDefinition().any().setValue(ROTATION, 0).setValue(SIZE, 0).setValue(INVISIBLE, false));
     }
 
@@ -54,7 +55,7 @@ public class CoasterBlock extends BaseEntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE;
     }
 
     @Override
@@ -121,14 +122,11 @@ public class CoasterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove( BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved ) {
-        if ( !state.is(newState.getBlock()) ) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if ( blockEntity instanceof CoasterBlockEntity be ) {
-                Containers.dropContents(level, pos, be.getItems());
-                level.updateNeighbourForOutputSignal(pos, this);
-            }
-            super.onRemove(state, level, pos, newState, moved);
+    protected void affectNeighborsAfterRemoval( BlockState state, ServerLevel level, BlockPos pos, boolean moved ) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if ( blockEntity instanceof CoasterBlockEntity be ) {
+            Containers.dropContents(level, pos, be.getItems());
+            Containers.updateNeighboursAfterDestroy(state, level, pos);
         }
     }
 
@@ -138,17 +136,17 @@ public class CoasterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos, Direction direction) {
         return Math.min(blockState.getValue(SIZE) * 4, 15);
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         if (level.getBlockEntity(pos) instanceof CoasterBlockEntity blockEntity && blockEntity.getItems().stream().anyMatch(stack -> !stack.isEmpty())) {
             List<ItemStack> stacks = blockEntity.getItems().stream().filter(stack -> !stack.isEmpty()).toList();
             return stacks.getLast();
         }
-        return super.getCloneItemStack(level, pos, state);
+        return super.getCloneItemStack(level, pos, state, includeData, player);
     }
 
     @Override

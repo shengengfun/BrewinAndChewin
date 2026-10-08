@@ -2,11 +2,14 @@ package umpaz.brewinandchewin.data.builder;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import vectorwing.farmersdelight.common.crafting.CuttingBoardRecipe;
 import vectorwing.farmersdelight.common.crafting.ingredient.ChanceResult;
@@ -61,12 +64,12 @@ public class BnCCuttingRecipeBuilder {
     }
 
     public void build(RecipeOutput consumerIn) {
-        Identifier location = BuiltInRegistries.ITEM.getKey(this.ingredient.getItems()[0].getItem());
+        Identifier location = BuiltInRegistries.ITEM.getKey(this.ingredient.items().findFirst().orElseThrow().value());
         this.build(consumerIn, "brewinandchewin:cutting/" + location.getPath());
     }
 
     public void build(RecipeOutput consumerIn, String save) {
-        Identifier resourcelocation = BuiltInRegistries.ITEM.getKey(this.ingredient.getItems()[0].getItem());
+        Identifier resourcelocation = BuiltInRegistries.ITEM.getKey(this.ingredient.items().findFirst().orElseThrow().value());
         Identifier parsed = Identifier.tryParse(save);
         if (parsed != null && parsed.equals(resourcelocation)) {
             throw new IllegalStateException("Cutting Recipe " + save + " should remove its 'save' argument");
@@ -76,6 +79,6 @@ public class BnCCuttingRecipeBuilder {
     }
 
     public void build(RecipeOutput consumerIn, Identifier id) {
-        consumerIn.accept(id, new CuttingBoardRecipe("", this.ingredient, this.tool, this.results, this.soundEvent), null);
+        consumerIn.accept(ResourceKey.create(Registries.RECIPE, id), new CuttingBoardRecipe("", this.ingredient, this.tool, this.results, this.soundEvent), null);
     }
 }

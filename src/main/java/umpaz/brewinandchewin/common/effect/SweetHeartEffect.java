@@ -4,6 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.server.level.ServerLevel;
 
 public class SweetHeartEffect extends MobEffect {
 
@@ -22,7 +23,7 @@ public class SweetHeartEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
         if (entity instanceof ServerPlayer player) {
             float saturation = player.getFoodData().getSaturationLevel();
             if (saturation > 0 && player.getHealth() < player.getMaxHealth()) {

@@ -11,9 +11,9 @@ import java.util.List;
  *
  * 26.1 rewrote the pieces this used to assemble: block render layers are derived from the material
  * (so the registration is gone), BlockColor/ItemColor became registry-backed tint sources plus JSON
- * tint_sources, the dynamic coaster model moved to BlockStateModel/ItemModel, and particle and
- * block-entity-renderer registration moved to the new render-state APIs. Each of those is recorded
- * in reports/bac-26.1-status.md; what remains here is the tooltip helper, which is unchanged.
+ * tint_sources, the dynamic coaster model moved to BlockStateModel/ItemModel, and the block entity
+ * renderers moved to the new render-state API. Each of those is recorded in
+ * reports/bac-26.1-status.md; what remains here is the tooltip helper, which is unchanged.
  */
 public class BnCClientSetup {
 

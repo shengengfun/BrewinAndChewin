@@ -7,6 +7,6 @@ import umpaz.brewinandchewin.client.gui.LabelScreen;
 
 public class BnCClientHooks {
     public static void openLabelScreen(ItemStack stack, InteractionHand hand) {
-        Minecraft.getInstance().setScreen(new LabelScreen(stack, hand));
+        Minecraft.getInstance().setScreen(new LabelScreen(net.minecraft.network.chat.Component.translatable("brewinandchewin.label")));
     }
 }

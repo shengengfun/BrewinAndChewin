@@ -33,6 +33,10 @@ import umpaz.brewinandchewin.common.utility.BnCWineUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.item.component.UseRemainder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class AgingCaskBlockEntity extends BaseContainerBlockEntity implements WorldlyContainer {
     public static final int WINE_SLOT = 0;
@@ -195,7 +199,7 @@ public class AgingCaskBlockEntity extends BaseContainerBlockEntity implements Wo
 
         ItemStack aged = wine.copy();
         BnCWineUtils.setContents(aged, BnCWineUtils.age(wineItem.getWineType(),
-                BnCWineUtils.getContents(wine), distillates, level.random));
+                BnCWineUtils.getContents(wine), distillates, level.getRandom()));
 
         this.inventory.set(OUTPUT_SLOT, aged);
         this.inventory.set(WINE_SLOT, ItemStack.EMPTY);
@@ -215,8 +219,9 @@ public class AgingCaskBlockEntity extends BaseContainerBlockEntity implements Wo
     public static ItemStack getContainerItem(ItemStack stack) {
         if (stack.getItem() instanceof PotionItem)
             return new ItemStack(Items.GLASS_BOTTLE);
-        if (stack.getItem().hasCraftingRemainingItem())
-            return new ItemStack(stack.getItem().getCraftingRemainingItem());
+        UseRemainder remainder = stack.get(DataComponents.USE_REMAINDER);
+        if (remainder != null)
+            return remainder.convertInto().create();
         return ItemStack.EMPTY;
     }
 

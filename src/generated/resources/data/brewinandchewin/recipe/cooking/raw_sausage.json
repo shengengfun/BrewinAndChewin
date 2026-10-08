@@ -2,19 +2,12 @@
   "type": "farmersdelight:cooking",
   "experience": 0.35,
   "ingredients": [
-    {
-      "item": "brewinandchewin:innards"
-    },
-    {
-      "tag": "c:foods/raw_meat"
-    },
-    {
-      "tag": "c:foods/raw_meat"
-    }
+    "brewinandchewin:innards",
+    "#c:foods/raw_meat",
+    "#c:foods/raw_meat"
   ],
   "recipe_book_tab": "meals",
   "result": {
-    "count": 1,
     "id": "brewinandchewin:raw_sausage"
   }
 }

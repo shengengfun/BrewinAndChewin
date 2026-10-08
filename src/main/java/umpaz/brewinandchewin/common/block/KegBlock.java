@@ -46,6 +46,7 @@ import umpaz.brewinandchewin.common.utility.BnCMathUtils;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.server.level.ServerLevel;
 
 public class KegBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
     private static final float FERMENTING_SOUND_CHANCE = 0.08F; //see line 137 for info ~Oska
@@ -174,24 +175,20 @@ public class KegBlock extends BaseEntityBlock implements SimpleWaterloggedBlock 
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
-        ItemStack stack = super.getCloneItemStack(level, pos, state);
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
+        ItemStack stack = super.getCloneItemStack(level, pos, state, includeData, player);
         Optional<KegBlockEntity> kegBE = level.getBlockEntity(pos, BnCBlockEntityTypes.KEG);
         kegBE.ifPresent(blockEntity -> stack.applyComponents(blockEntity.collectComponents()));
         return stack;
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (state.getBlock() != newState.getBlock()) {
-            BlockEntity tileEntity = level.getBlockEntity(pos);
-            if (tileEntity instanceof KegBlockEntity kegEntity) {
-                Containers.dropContents(level, pos, kegEntity.getDroppableInventory());
-                kegEntity.getUsedRecipesAndPopExperience(level, Vec3.atCenterOf(pos));
-                level.updateNeighbourForOutputSignal(pos, this);
-            }
-
-            super.onRemove(state, level, pos, newState, isMoving);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        BlockEntity tileEntity = level.getBlockEntity(pos);
+        if (tileEntity instanceof KegBlockEntity kegEntity) {
+            Containers.dropContents(level, pos, kegEntity.getDroppableInventory());
+            kegEntity.getUsedRecipesAndPopExperience(level, Vec3.atCenterOf(pos));
+            Containers.updateNeighboursAfterDestroy(state, level, pos);
         }
     }
 
@@ -207,7 +204,7 @@ public class KegBlock extends BaseEntityBlock implements SimpleWaterloggedBlock 
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos, Direction direction) {
         BlockEntity tileEntity = level.getBlockEntity(pos);
         if (tileEntity instanceof KegBlockEntity) {
             AbstractedItemHandler inventory = ((KegBlockEntity) tileEntity).getInventory();

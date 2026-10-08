@@ -100,7 +100,7 @@ public class BnCAdvancements implements AdvancementSubProvider {
         AdvancementHolder brewDrink = getAdvancement(placeKeg, BnCItems.VODKA, Component.translatable("brewinandchewin.advancement.brew_drink"), Component.translatable("brewinandchewin.advancement.brew_drink.desc"), AdvancementType.TASK, true, true, false)
                 .addCriterion("has_drink", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items, BnCTags.Items.FERMENTED_DRINKS).build()))
                 .save(saver, BrewinAndChewin.asResource("main/brew_drink").toString());
-        AdvancementHolder craftingProblem = getCraftingProblemAdvancement(getAdvancement(brewDrink, BnCItems.STEEL_TOE_STOUT, Component.translatable("brewinandchewin.advancement.crafting_problem"), Component.translatable("brewinandchewin.advancement.crafting_problem.desc"), AdvancementType.CHALLENGE, true, true, false))
+        AdvancementHolder craftingProblem = getCraftingProblemAdvancement(getAdvancement(brewDrink, BnCItems.STEEL_TOE_STOUT, Component.translatable("brewinandchewin.advancement.crafting_problem"), Component.translatable("brewinandchewin.advancement.crafting_problem.desc"), AdvancementType.CHALLENGE, true, true, false), items)
                 .rewards(AdvancementRewards.Builder.experience(100))
                 .save(saver, BrewinAndChewin.asResource("main/crafting_problem").toString());
         AdvancementHolder fermentCheese = getAdvancement(placeKeg, BnCItems.UNRIPE_FLAXEN_CHEESE_WHEEL, Component.translatable("brewinandchewin.advancement.ferment_cheese"), Component.translatable("brewinandchewin.advancement.ferment_cheese.desc"), AdvancementType.TASK, true, true, false)
@@ -113,13 +113,13 @@ public class BnCAdvancements implements AdvancementSubProvider {
                 .requirements(AdvancementRequirements.Strategy.OR)
                 .rewards(AdvancementRewards.Builder.experience(50))
                 .save(saver, BrewinAndChewin.asResource("main/cook_fiery_fondue").toString());
-        AdvancementHolder chefOfTheAges = getChefOfTheAgesAdvancement(getAdvancement(cookFieryFondue, BnCItems.PIZZA, Component.translatable("brewinandchewin.advancement.chef_of_the_ages"), Component.translatable("brewinandchewin.advancement.chef_of_the_ages.desc"), AdvancementType.CHALLENGE,true, true, false))
+        AdvancementHolder chefOfTheAges = getChefOfTheAgesAdvancement(getAdvancement(cookFieryFondue, BnCItems.PIZZA, Component.translatable("brewinandchewin.advancement.chef_of_the_ages"), Component.translatable("brewinandchewin.advancement.chef_of_the_ages.desc"), AdvancementType.CHALLENGE,true, true, false), items)
                 .rewards(AdvancementRewards.Builder.experience(100))
                 .save(saver, BrewinAndChewin.asResource("main/chef_of_the_ages").toString());
     }
 
     protected static Advancement.Builder getAdvancement(AdvancementHolder parent, ItemLike item, Component name, Component description, AdvancementType frameType, boolean showToast, boolean announceToChat, boolean hidden) {
-        return Advancement.Builder.advancement().parent(parent).display(item.asItem().getDefaultInstance(), name, description, null, frameType, showToast, announceToChat, hidden);
+        return Advancement.Builder.advancement().parent(parent).display(item, name, description, null, frameType, showToast, announceToChat, hidden);
     }
 
     protected static Criterion<ItemUsedOnLocationTrigger.TriggerInstance> itemUsedOnBlock(LootItemCondition.Builder... pConditions) {
@@ -127,16 +127,16 @@ public class BnCAdvancements implements AdvancementSubProvider {
         return CriteriaTriggers.ITEM_USED_ON_BLOCK.createCriterion(new ItemUsedOnLocationTrigger.TriggerInstance(Optional.empty(), Optional.of(predicate)));
     }
 
-    protected static Advancement.Builder getCraftingProblemAdvancement(Advancement.Builder builder) {
+    protected static Advancement.Builder getCraftingProblemAdvancement(Advancement.Builder builder, HolderGetter<Item> items) {
         for (Item drink : DRINKS) {
-            builder.addCriterion(drink.builtInRegistryHolder().key().location().toString(), ConsumeItemTrigger.TriggerInstance.usedItem(drink));
+            builder.addCriterion(drink.builtInRegistryHolder().key().identifier().toString(), ConsumeItemTrigger.TriggerInstance.usedItem(items, drink));
         }
         return builder;
     }
 
-    protected static Advancement.Builder getChefOfTheAgesAdvancement(Advancement.Builder builder) {
+    protected static Advancement.Builder getChefOfTheAgesAdvancement(Advancement.Builder builder, HolderGetter<Item> items) {
         for (Item meal : MEALS) {
-            builder.addCriterion(meal.builtInRegistryHolder().key().location().toString(), ConsumeItemTrigger.TriggerInstance.usedItem(meal));
+            builder.addCriterion(meal.builtInRegistryHolder().key().identifier().toString(), ConsumeItemTrigger.TriggerInstance.usedItem(items, meal));
         }
         return builder;
     }

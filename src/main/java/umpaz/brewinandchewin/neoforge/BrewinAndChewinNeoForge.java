@@ -17,16 +17,18 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import umpaz.brewinandchewin.BrewinAndChewin;
+import umpaz.brewinandchewin.common.BnCConfiguration;
 import umpaz.brewinandchewin.common.network.clientbound.*;
-import umpaz.brewinandchewin.common.network.serverbound.JEITransferKegRecipeServerboundPacket;
 import umpaz.brewinandchewin.common.network.serverbound.SetLabelContentsServerboundPacket;
 import umpaz.brewinandchewin.common.registry.*;
 import umpaz.brewinandchewin.common.registry.BnCCreativeTabs;
+import umpaz.brewinandchewin.neoforge.container.LegacyItemHandlerResourceHandler;
+import umpaz.brewinandchewin.neoforge.container.LegacyFluidHandlerResourceHandler;
 import umpaz.brewinandchewin.neoforge.container.KegFluidTankNeoForge;
 import umpaz.brewinandchewin.neoforge.container.SidedKegWrapperNeoForge;
-import net.minecraft.world.item.Items;
 import umpaz.brewinandchewin.neoforge.container.TankardItemFluidHandlerNeoForge;
 import umpaz.brewinandchewin.neoforge.container.WineBottleItemFluidHandlerNeoForge;
+import net.minecraft.world.item.Items;
 import umpaz.brewinandchewin.neoforge.item.TankardItem;
 import umpaz.brewinandchewin.neoforge.registry.BnCAttachments;
 import umpaz.brewinandchewin.neoforge.registry.BnCFluidTypes;
@@ -53,9 +55,9 @@ public class BrewinAndChewinNeoForge {
     public static class RegistryEvents {
         @SubscribeEvent
         public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, BnCBlockEntityTypes.KEG, (blockEntity, direction) -> (SidedKegWrapperNeoForge) blockEntity.getSidedHandler(direction));
-            event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BnCBlockEntityTypes.KEG, (blockEntity, direction) -> (KegFluidTankNeoForge) blockEntity.getFluidTank());
-            event.registerItem(Capabilities.FluidHandler.ITEM,(stack, ctx) -> new TankardItemFluidHandlerNeoForge(stack, TankardItem.CAPACITY),
+            event.registerBlockEntity(Capabilities.Item.BLOCK, BnCBlockEntityTypes.KEG, (blockEntity, direction) -> new LegacyItemHandlerResourceHandler((SidedKegWrapperNeoForge) blockEntity.getSidedHandler(direction), blockEntity::setChanged));
+            event.registerBlockEntity(Capabilities.Fluid.BLOCK, BnCBlockEntityTypes.KEG, (blockEntity, direction) -> new LegacyFluidHandlerResourceHandler((KegFluidTankNeoForge) blockEntity.getFluidTank(), blockEntity::setChanged));
+            event.registerItem(Capabilities.Fluid.ITEM,(stack, access) -> new LegacyFluidHandlerResourceHandler(new TankardItemFluidHandlerNeoForge(stack, TankardItem.CAPACITY)),
                     BnCItems.TANKARD,
                     BnCItems.BEER,
                     BnCItems.MEAD,
@@ -71,7 +73,7 @@ public class BrewinAndChewinNeoForge {
                     BnCItems.DREAD_NOG,
                     BnCItems.WITHERING_DROSS
             );
-            event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new WineBottleItemFluidHandlerNeoForge(stack),
+            event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new LegacyFluidHandlerResourceHandler(new WineBottleItemFluidHandlerNeoForge(stack)),
                     Items.GLASS_BOTTLE
             );
         }
@@ -108,7 +110,6 @@ public class BrewinAndChewinNeoForge {
                     .playToClient(SendRecipeBookValuesClientboundPacket.TYPE, SendRecipeBookValuesClientboundPacket.STREAM_CODEC, (payload, context) -> payload.handle())
                     .playToClient(SyncNumbedHeartsClientboundPacket.TYPE, SyncNumbedHeartsClientboundPacket.STREAM_CODEC, (payload, context) -> payload.handle())
                     .playToClient(SyncRagingStacksClientboundPacket.TYPE, SyncRagingStacksClientboundPacket.STREAM_CODEC, (payload, context) -> payload.handle())
-                    .playToServer(JEITransferKegRecipeServerboundPacket.TYPE, JEITransferKegRecipeServerboundPacket.STREAM_CODEC, (payload, context) -> payload.handle((ServerPlayer) context.player()))
                     .playToServer(SetLabelContentsServerboundPacket.TYPE, SetLabelContentsServerboundPacket.STREAM_CODEC, (payload, context) -> payload.handle((ServerPlayer) context.player()));
         }
 

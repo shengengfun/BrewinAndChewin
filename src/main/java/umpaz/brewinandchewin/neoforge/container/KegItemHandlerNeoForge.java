@@ -1,7 +1,7 @@
 package umpaz.brewinandchewin.neoforge.container;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import umpaz.brewinandchewin.common.container.AbstractedItemHandler;
 
@@ -16,13 +16,12 @@ public class KegItemHandlerNeoForge extends ItemStackHandler implements Abstract
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag, HolderLookup.Provider provider) {
-        deserializeNBT(provider, tag);
+    public void serialize(ValueOutput output) {
+        super.serialize(output);
     }
 
     @Override
-    public CompoundTag writeToNbt(HolderLookup.Provider provider) {
-        return serializeNBT(provider);
+    public void deserialize(ValueInput input) {
+        super.deserialize(input);
     }
-
 }

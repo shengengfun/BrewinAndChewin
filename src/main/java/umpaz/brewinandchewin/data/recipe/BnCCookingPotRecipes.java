@@ -25,24 +25,24 @@ public class BnCCookingPotRecipes {
     public static final float LARGE_EXP = 2.0F;
 
     public static void register(RecipeOutput consumer, HolderGetter<Item> items) {
-        cook(consumer);
+        cook(consumer, items);
     }
 
-    private static void cook(RecipeOutput consumer) {
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.RAW_SAUSAGE, 1, NORMAL_COOKING, SMALL_EXP)
+    private static void cook(RecipeOutput consumer, HolderGetter<Item> items) {
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.RAW_SAUSAGE, 1, NORMAL_COOKING, SMALL_EXP)
                 .addIngredient(BnCItems.INNARDS)
-                .addIngredient(Ingredient.of(Tags.Items.FOODS_RAW_MEAT), 2)
+                .addIngredient(Ingredient.of(items.getOrThrow(Tags.Items.FOODS_RAW_MEAT)), 2)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_innards", BnCItems.INNARDS)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.HAGGIS, 2, SLOW_COOKING, MEDIUM_EXP, BnCItems.INNARDS)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.HAGGIS, 2, SLOW_COOKING, MEDIUM_EXP, BnCItems.INNARDS)
                 .addIngredient(BnCTags.Items.HAGGIS_MEAT)
                 .addIngredient(BnCTags.Items.HAGGIS_VEGETABLE)
                 .addIngredient(BnCItems.CORNMEAL)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_cornmeal", BnCItems.CORNMEAL)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.CHOPPED_LIVER, 1, SLOW_COOKING, LARGE_EXP, Items.BOWL)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.CHOPPED_LIVER, 1, SLOW_COOKING, LARGE_EXP, Items.BOWL)
                 .addIngredient(BnCItems.INNARDS, 2)
                 .addIngredient(Tags.Items.CROPS_BEETROOT)
                 .addIngredient(Tags.Items.EGGS)
@@ -51,31 +51,31 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_innards", BnCItems.INNARDS)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.RENNET, 1, NORMAL_COOKING, SMALL_EXP)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.RENNET, 1, NORMAL_COOKING, SMALL_EXP)
                 .addIngredient(BnCItems.INNARDS, 2)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MISC)
                 .unlockedByItems("has_innards", BnCItems.INNARDS)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.GRITS, 1, NORMAL_COOKING, SMALL_EXP, Items.BOWL)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.GRITS, 1, NORMAL_COOKING, SMALL_EXP, Items.BOWL)
                 .addIngredient(BnCItems.CORNMEAL, 2)
                 .addIngredient(Tags.Items.DRINKS_MILK)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_cornmeal", BnCItems.CORNMEAL)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.CANDIED_CORN, 1, FAST_COOKING, SMALL_EXP)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.CANDIED_CORN, 1, FAST_COOKING, SMALL_EXP)
                 .addIngredient(BnCItems.CORN_KERNELS)
                 .addIngredient(Items.SUGAR)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MISC)
                 .unlockedByItems("has_corn_kernels", BnCItems.CORN_KERNELS)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.BUTTERSCOTCH_CANDY, 1, FAST_COOKING, SMALL_EXP, Items.PAPER)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.BUTTERSCOTCH_CANDY, 1, FAST_COOKING, SMALL_EXP, Items.PAPER)
                 .addIngredient(Items.SUGAR, 2)
                 .addIngredient(Tags.Items.DRINKS_MILK)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MISC)
                 .unlockedByItems("has_sugar", Items.SUGAR)
                 .build(consumer);
 
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.CHEESY_PASTA, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.CHEESY_PASTA, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
                 .addIngredient(BnCItems.FLAXEN_CHEESE_WEDGE)
                 .addIngredient(CommonTags.Items.FOODS_PASTA)
                 .addIngredient(CommonTags.Items.FOODS_TOMATO)
@@ -83,7 +83,7 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_cheese", BnCItems.FLAXEN_CHEESE_WEDGE)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.CREAMY_ONION_SOUP, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.CREAMY_ONION_SOUP, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
                 .addIngredient(BnCTags.Items.FOOD_CHEESE_WEDGE)
                 .addIngredient(CommonTags.Items.FOODS_ONION)
                 .addIngredient(Tags.Items.FOODS_VEGETABLE)
@@ -91,7 +91,7 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedBy("has_cheese", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(items, BnCTags.Items.FOOD_CHEESE_WEDGE).build()))
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.FIERY_FONDUE_POT, 1, SLOW_COOKING, LARGE_EXP, Items.CAULDRON)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.FIERY_FONDUE_POT, 1, SLOW_COOKING, LARGE_EXP, Items.CAULDRON)
                 .addIngredient(ModItems.TOMATO_SAUCE.get())
                 .addIngredient(Tags.Items.CROPS_POTATO)
                 .addIngredient(Tags.Items.DRINKS_MILK)
@@ -101,7 +101,7 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_cheese", BnCItems.SCARLET_CHEESE_WHEEL)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.HORROR_LASAGNA, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.HORROR_LASAGNA, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
                 .addIngredient(BnCItems.SCARLET_CHEESE_WEDGE)
                 .addIngredient(Tags.Items.CROPS_BEETROOT)
                 .addIngredient(ModItems.TOMATO_SAUCE.get())
@@ -110,7 +110,7 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_cheese", BnCItems.SCARLET_CHEESE_WEDGE)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.SCARLET_PIEROGI, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.SCARLET_PIEROGI, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
                 .addIngredient(BnCItems.SCARLET_CHEESE_WEDGE)
                 .addIngredient(Tags.Items.CROPS_POTATO)
                 .addIngredient(CommonTags.Items.FOODS_DOUGH)
@@ -119,7 +119,7 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MEALS)
                 .unlockedByItems("has_cheese", BnCItems.SCARLET_CHEESE_WEDGE)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.VEGETABLE_OMELET, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.VEGETABLE_OMELET, 1, NORMAL_COOKING, MEDIUM_EXP, Items.BOWL)
                 .addIngredient(BnCTags.Items.FOOD_CHEESE_WEDGE)
                 .addIngredient(Tags.Items.EGGS)
                 .addIngredient(Tags.Items.EGGS)
@@ -130,7 +130,7 @@ public class BnCCookingPotRecipes {
                 .build(consumer);
 
 
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.SWEET_BERRY_JAM, 1, NORMAL_COOKING, MEDIUM_EXP, Items.GLASS_BOTTLE)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.SWEET_BERRY_JAM, 1, NORMAL_COOKING, MEDIUM_EXP, Items.GLASS_BOTTLE)
                 .addIngredient(Items.SWEET_BERRIES)
                 .addIngredient(Items.SWEET_BERRIES)
                 .addIngredient(Items.SWEET_BERRIES)
@@ -138,7 +138,7 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MISC)
                 .unlockedByItems("has_sweet_berries", Items.SWEET_BERRIES)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.GLOW_BERRY_MARMALADE, 1, NORMAL_COOKING, MEDIUM_EXP, Items.GLASS_BOTTLE)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.GLOW_BERRY_MARMALADE, 1, NORMAL_COOKING, MEDIUM_EXP, Items.GLASS_BOTTLE)
                 .addIngredient(Items.GLOW_BERRIES)
                 .addIngredient(Items.GLOW_BERRIES)
                 .addIngredient(Items.GLOW_BERRIES)
@@ -146,7 +146,7 @@ public class BnCCookingPotRecipes {
                 .setRecipeBookTab(CookingPotRecipeBookTab.MISC)
                 .unlockedByItems("has_glow_berries", Items.GLOW_BERRIES)
                 .build(consumer);
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.APPLE_JELLY, 1, NORMAL_COOKING, MEDIUM_EXP, Items.GLASS_BOTTLE)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.APPLE_JELLY, 1, NORMAL_COOKING, MEDIUM_EXP, Items.GLASS_BOTTLE)
                 .addIngredient(Items.APPLE)
                 .addIngredient(Items.APPLE)
                 .addIngredient(Items.APPLE)

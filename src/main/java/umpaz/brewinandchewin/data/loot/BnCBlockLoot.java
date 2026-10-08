@@ -38,6 +38,7 @@ import umpaz.brewinandchewin.common.loot.function.CopyDrinkFunction;
 
 import java.util.HashSet;
 import java.util.Set;
+import net.minecraft.world.level.storage.loot.LootContext;
 
 public class BnCBlockLoot extends BlockLootSubProvider {
 
@@ -50,7 +51,7 @@ public class BnCBlockLoot extends BlockLootSubProvider {
     @Override
     protected void generate() {
         add(BnCBlocks.KEG, (block) -> LootTable.lootTable().withPool(this.applyExplosionCondition(block, LootPool.lootPool().setRolls(ConstantValue.exactly(1.0F)).add(LootItem.lootTableItem(block)
-                .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY)).apply(CopyDrinkFunction.builder())))));
+                .apply(CopyNameFunction.copyName(LootContext.BlockEntityTarget.BLOCK_ENTITY)).apply(CopyDrinkFunction.builder())))));
         dropSelf(BnCBlocks.TRELLIS);
         add(BnCBlocks.TRELLIS_GRAPE, noDrop());
         dropSelf(BnCBlocks.HEATING_CASK);
@@ -85,7 +86,7 @@ public class BnCBlockLoot extends BlockLootSubProvider {
                         .hasProperty(CornCropBlock.SECTION, 0));
     }
 
-    private static LootItemCondition.Builder shears() {
+    private LootItemCondition.Builder shears() {
         return AnyOfCondition.anyOf(
                 MatchTool.toolMatches(ItemPredicate.Builder.item().of(this.registries.lookupOrThrow(Registries.ITEM), Tags.Items.TOOLS_SHEAR)),
                 MatchTool.toolMatches(ItemPredicate.Builder.item().of(this.registries.lookupOrThrow(Registries.ITEM), Items.SHEARS)));
@@ -151,7 +152,7 @@ public class BnCBlockLoot extends BlockLootSubProvider {
     @Override
     protected void add(Block block, LootTable.Builder builder) {
         this.generatedLootTables.add(block);
-        this.map.put(block.getLootTable(), builder);
+        super.add(block, builder);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package umpaz.brewinandchewin.common.utility;
 
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -35,14 +35,14 @@ public class BnCLabelUtils {
 
     public static int getDyeColor(ItemStack stack) {
         DyedItemColor dyed = stack.get(DataComponents.DYED_COLOR);
-        return dyed == null ? -1 : FastColor.ARGB32.opaque(dyed.rgb());
+        return dyed == null ? -1 : ARGB.opaque(dyed.rgb());
     }
 
     public static int getLabelColor(ItemStack stack) {
         Optional<LabelContents> contents = getLabel(stack);
         if (contents.isPresent() && contents.get().color().isPresent())
-            return FastColor.ARGB32.opaque(contents.get().color().get());
-        return FastColor.ARGB32.opaque(DyedItemColor.getOrDefault(stack, DEFAULT_LABEL_COLOR));
+            return ARGB.opaque(contents.get().color().get());
+        return ARGB.opaque(DyedItemColor.getOrDefault(stack, DEFAULT_LABEL_COLOR));
     }
 
     public static LabelContents readFromItem(ItemStack stack) {

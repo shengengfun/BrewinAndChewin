@@ -56,14 +56,14 @@ public class FieryFonduePotBlock extends Block {
     }
 
     @Override
-    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, net.minecraft.world.entity.InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         if (this.isEntityInsideContent(state, pos, entity)) {
             entity.lavaHurt();
         }
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         return state.getValue(LEVEL);
     }
 
@@ -105,7 +105,7 @@ public class FieryFonduePotBlock extends Block {
             level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_GENERIC.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
             return InteractionResult.SUCCESS;
         }
-        player.displayClientMessage(TextUtils.block("feast.use_container", bowl.getHoverName()), true);
+        player.sendOverlayMessage(TextUtils.block("feast.use_container", bowl.getHoverName()));
         return InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
@@ -132,7 +132,7 @@ public class FieryFonduePotBlock extends Block {
     @Override
     public void animateTick(BlockState stateIn, Level level, BlockPos pos, RandomSource rand) {
         super.animateTick(stateIn, level, pos, rand);
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
         if (random.nextFloat() < 0.8F) {
             double x = (double) pos.getX() + 0.5D + (random.nextDouble() * 0.6D - 0.3D);
             double y = (double) pos.getY() + this.getContentHeight(stateIn);

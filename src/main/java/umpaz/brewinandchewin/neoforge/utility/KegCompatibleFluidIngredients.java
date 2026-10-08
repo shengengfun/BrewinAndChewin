@@ -9,6 +9,7 @@ import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.PatchedDataComponentMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -51,7 +52,7 @@ public class KegCompatibleFluidIngredients {
 
     public static class Exact implements AbstractedFluidIngredient {
         public static final Codec<Exact> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-                        FluidStack.FLUID_NON_EMPTY_CODEC.fieldOf("id").forGetter(stack -> stack.displayStack.fluid().builtInRegistryHolder()),
+                        BuiltInRegistries.FLUID.holderByNameCodec().fieldOf("id").forGetter(stack -> stack.displayStack.fluid().builtInRegistryHolder()),
                         DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(fluidStack -> fluidStack.displayStack.components() instanceof PatchedDataComponentMap patched ? patched.asPatch() : DataComponentPatch.EMPTY))
                 .apply(inst, (t1, t2) -> new Exact(t1.value(), t2)));
         public static final StreamCodec<RegistryFriendlyByteBuf, Exact> STREAM_CODEC = AbstractedFluidStack.STREAM_CODEC.map(Exact::new, exact -> exact.displayStack);
@@ -145,7 +146,7 @@ public class KegCompatibleFluidIngredients {
 
         public NeoForgeIngredient(FluidIngredient ingredient) {
             this.ingredient = ingredient;
-            displayStacks = Arrays.stream(ingredient.getStacks()).map(fluidStack -> new AbstractedFluidStack(fluidStack.getFluid(), DISPLAY_AMOUNT, fluidStack.getComponents(), FluidUnit.MILLIBUCKET, fluidStack)).toList();
+            displayStacks = ingredient.fluids().stream().map(fluidHolder -> new AbstractedFluidStack(fluidHolder.value(), DISPLAY_AMOUNT, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, DataComponentPatch.EMPTY), FluidUnit.MILLIBUCKET, new FluidStack(fluidHolder, DISPLAY_AMOUNT))).toList();
         }
 
         @Override

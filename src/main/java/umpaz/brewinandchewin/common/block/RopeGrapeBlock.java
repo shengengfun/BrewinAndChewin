@@ -41,6 +41,8 @@ import vectorwing.farmersdelight.common.registry.ModBlocks;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.world.level.redstone.Orientation;
+import org.jspecify.annotations.Nullable;
 
 public class RopeGrapeBlock extends Block implements SimpleWaterloggedBlock, BonemealableBlock {
     public static final EnumProperty<GrapePart> PART = EnumProperty.create("part", GrapePart.class);
@@ -98,7 +100,7 @@ public class RopeGrapeBlock extends Block implements SimpleWaterloggedBlock, Bon
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+    protected boolean propagatesSkylightDown(BlockState state) {
         return !state.getValue(WATERLOGGED);
     }
 
@@ -115,10 +117,10 @@ public class RopeGrapeBlock extends Block implements SimpleWaterloggedBlock, Bon
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbourBlock, BlockPos neighbourPos, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, neighbourBlock, neighbourPos, movedByPiston);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighbourBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighbourBlock, orientation, movedByPiston);
         if (!level.isClientSide())
-            ticks.scheduleTick(pos, this, 1);
+            level.scheduleTick(pos, this, 1);
     }
 
     @Override

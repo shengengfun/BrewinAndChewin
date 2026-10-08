@@ -27,8 +27,8 @@ public class BnCAddTableModifier extends LootModifier {
 
     private final Identifier table;
 
-    protected BnCAddTableModifier(LootItemCondition[] conditions, Identifier table) {
-        super(conditions);
+    protected BnCAddTableModifier(LootItemCondition[] conditions, int priority, Identifier table) {
+        super(conditions, priority);
         this.table = table;
     }
 
@@ -36,7 +36,7 @@ public class BnCAddTableModifier extends LootModifier {
     @Override
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         LootTable extra = context.getResolver()
-                .get(Registries.LOOT_TABLE, ResourceKey.create(Registries.LOOT_TABLE, this.table))
+                .get(ResourceKey.create(Registries.LOOT_TABLE, this.table))
                 .<LootTable>map(Holder::value)
                 .orElse(LootTable.EMPTY);
         LootParams params = new LootParams.Builder(context.getLevel()).create(extra.getParamSet());

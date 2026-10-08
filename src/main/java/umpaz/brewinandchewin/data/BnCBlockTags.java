@@ -42,7 +42,9 @@ public class BnCBlockTags extends IntrinsicHolderTagsProvider<Block>
 
     protected void registerWildGrapeSupports() {
         tag(BnCTags.Blocks.WILD_GRAPES_GROW_ON)
-                .addTag(BlockTags.SPRUCE_LOGS)
+                .addTag(BlockTags.SPRUCE_LOGS);
+        // 26.1 TagAppender#addOptionalTag only takes a TagKey, so optional entries go through the raw builder.
+        getOrCreateRawBuilder(BnCTags.Blocks.WILD_GRAPES_GROW_ON)
                 .addOptionalTag(Identifier.fromNamespaceAndPath(NMLIntegration.MOD_ID, "coniferous_logs"));
     }
 

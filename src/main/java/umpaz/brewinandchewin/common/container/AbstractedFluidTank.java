@@ -3,10 +3,11 @@ package umpaz.brewinandchewin.common.container;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
 import umpaz.brewinandchewin.common.utility.FluidUnit;
 
-public interface AbstractedFluidTank {
+public interface AbstractedFluidTank extends ValueIOSerializable {
     default long getFluidCapacity() {
         return getFluidCapacity(0);
     }
@@ -22,9 +23,17 @@ public interface AbstractedFluidTank {
 
     boolean isEmpty();
 
-    default void readFromNbt(CompoundTag tag, HolderLookup.Provider provider) {}
+    @Override
+    default void serialize(net.minecraft.world.level.storage.ValueOutput output) {}
+
+    @Override
+    default void deserialize(net.minecraft.world.level.storage.ValueInput input) {}
+
+    default void readFromNbt(CompoundTag tag, HolderLookup.Provider provider) {
+        deserialize(umpaz.brewinandchewin.common.utility.BnCValueIO.input(provider, tag));
+    }
     default CompoundTag writeToNbt(HolderLookup.Provider provider) {
-        return new CompoundTag();
+        return umpaz.brewinandchewin.common.utility.BnCValueIO.write(this, provider);
     }
 
     // Item Tank Fields

@@ -2,97 +2,126 @@ package umpaz.brewinandchewin.common.registry;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.block.SoundType;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.block.*;
 import vectorwing.farmersdelight.common.block.PieBlock;
 
 public class BnCBlocks {
     public static final Block KEG = new KegBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS));
+            blockProps("keg", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
 
     public static final Block HEATING_CASK = new HeatingCaskBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS));
+            blockProps("heating_cask", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
 
     public static final Block ICE_CRATE = new IceCrateBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS));
+            blockProps("ice_crate", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)));
 
-    public static final Block COASTER = new CoasterBlock();
+    public static final Block COASTER = new CoasterBlock(blockProps("coaster", BlockBehaviour.Properties.ofFullCopy(Blocks.BROWN_CARPET)));
 
     public static final Block AGING_CASK = new AgingCaskBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS).noOcclusion());
+            blockProps("aging_cask", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_PLANKS)).noOcclusion());
 
     public static final Block BOTTLE_RACK = new BottleRackBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_BOOKSHELF).noOcclusion());
+            blockProps("bottle_rack", BlockBehaviour.Properties.ofFullCopy(Blocks.CHISELED_BOOKSHELF)).noOcclusion());
 
     public static final Block RED_GRAPE_BUSH = new GrapeBushBlock(
-            GrapeColour.RED, BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT));
+            GrapeColour.RED, cropProps("red_grape_bush"));
     public static final Block WHITE_GRAPE_BUSH = new GrapeBushBlock(
-            GrapeColour.WHITE, BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT));
+            GrapeColour.WHITE, cropProps("white_grape_bush"));
 
     public static final Block WILD_GRAPES = new WildGrapesBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.VINE).noOcclusion());
+            blockProps("wild_grapes", BlockBehaviour.Properties.ofFullCopy(Blocks.VINE)).noOcclusion());
 
     public static final Block RED_GRAPE_STEM = new GrapeStemBlock(
-            GrapeColour.RED, BlockBehaviour.Properties.ofFullCopy(Blocks.VINE).noOcclusion());
+            GrapeColour.RED, blockProps("red_grape_stem", BlockBehaviour.Properties.ofFullCopy(Blocks.VINE)).noOcclusion());
     public static final Block WHITE_GRAPE_STEM = new GrapeStemBlock(
-            GrapeColour.WHITE, BlockBehaviour.Properties.ofFullCopy(Blocks.VINE).noOcclusion());
+            GrapeColour.WHITE, blockProps("white_grape_stem", BlockBehaviour.Properties.ofFullCopy(Blocks.VINE)).noOcclusion());
 
     public static final Block RED_ROPE_GRAPE = new RopeGrapeBlock(
-            GrapeColour.RED, BlockBehaviour.Properties.ofFullCopy(Blocks.VINE).randomTicks());
+            GrapeColour.RED, blockProps("red_rope_grape", BlockBehaviour.Properties.ofFullCopy(Blocks.VINE)).randomTicks());
     public static final Block WHITE_ROPE_GRAPE = new RopeGrapeBlock(
-            GrapeColour.WHITE, BlockBehaviour.Properties.ofFullCopy(Blocks.VINE).randomTicks());
+            GrapeColour.WHITE, blockProps("white_rope_grape", BlockBehaviour.Properties.ofFullCopy(Blocks.VINE)).randomTicks());
 
     public static final Block TRELLIS = new TrellisBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).noOcclusion());
+            blockProps("trellis", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR)).noOcclusion());
 
     public static final Block TRELLIS_GRAPE = new TrellisGrapeBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).noOcclusion().randomTicks());
+            blockProps("trellis_grape", BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR)).noOcclusion().randomTicks());
 
     public static final Block WILD_CORN = new WildCornBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.TALL_GRASS));
+            blockProps("wild_corn", BlockBehaviour.Properties.ofFullCopy(Blocks.TALL_GRASS)));
 
     public static final Block CORN_CROP = new CornCropBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT));
+            blockProps("corn_crop", BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT)));
 
 
 
     //Cheese
     public static final Block UNRIPE_FLAXEN_CHEESE_WHEEL = new
-            UnripeCheeseWheelBlock(() -> BnCBlocks.FLAXEN_CHEESE_WHEEL, Block.Properties.ofFullCopy(Blocks.CAKE));
+            UnripeCheeseWheelBlock(() -> BnCBlocks.FLAXEN_CHEESE_WHEEL, blockProps("unripe_flaxen_cheese_wheel", Block.Properties.ofFullCopy(Blocks.CAKE)));
 
     public static final Block FLAXEN_CHEESE_WHEEL = new
-            CheeseWheelBlock(() -> BnCItems.FLAXEN_CHEESE_WEDGE, Block.Properties.ofFullCopy(Blocks.CAKE));
+            CheeseWheelBlock(() -> BnCItems.FLAXEN_CHEESE_WEDGE, blockProps("flaxen_cheese_wheel", Block.Properties.ofFullCopy(Blocks.CAKE)));
 
     public static final Block UNRIPE_SCARLET_CHEESE_WHEEL = new
-            UnripeCheeseWheelBlock(() -> BnCBlocks.SCARLET_CHEESE_WHEEL, Block.Properties.ofFullCopy(Blocks.CAKE));
+            UnripeCheeseWheelBlock(() -> BnCBlocks.SCARLET_CHEESE_WHEEL, blockProps("unripe_scarlet_cheese_wheel", Block.Properties.ofFullCopy(Blocks.CAKE)));
 
     public static final Block SCARLET_CHEESE_WHEEL = new
-            CheeseWheelBlock(() -> BnCItems.SCARLET_CHEESE_WEDGE, Block.Properties.ofFullCopy(Blocks.CAKE));
+            CheeseWheelBlock(() -> BnCItems.SCARLET_CHEESE_WEDGE, blockProps("scarlet_cheese_wheel", Block.Properties.ofFullCopy(Blocks.CAKE)));
 
     // Feasts
     public static final Block FIERY_FONDUE_POT = new
-            FieryFonduePotBlock(Block.Properties.ofFullCopy(Blocks.CAULDRON));
+            FieryFonduePotBlock(blockProps("fiery_fondue_pot", Block.Properties.ofFullCopy(Blocks.CAULDRON)));
 
     public static final Block PIZZA = new
-            PizzaBlock(Block.Properties.ofFullCopy(Blocks.CAKE));
+            PizzaBlock(blockProps("pizza", Block.Properties.ofFullCopy(Blocks.CAKE)));
 
     public static final Block QUICHE = new
-            PieBlock(Block.Properties.ofFullCopy(Blocks.CAKE), () -> BnCItems.QUICHE_SLICE);
+            PieBlock(blockProps("quiche", Block.Properties.ofFullCopy(Blocks.CAKE)), () -> BnCItems.QUICHE_SLICE);
 
     public static final Block RICH_CHOCOLATE_CAKE = new
-            SlicedCakeBlock(Block.Properties.ofFullCopy(Blocks.CAKE), () -> BnCItems.SLICE_OF_RICH_CHOCOLATE_CAKE,
+            SlicedCakeBlock(blockProps("rich_chocolate_cake", Block.Properties.ofFullCopy(Blocks.CAKE)), () -> BnCItems.SLICE_OF_RICH_CHOCOLATE_CAKE,
             2.0D, 14.0D, 8.0D, 2.0D, 14.0D);
 
     public static final Block PUMPKIN_ROLL = new
-            SlicedCakeBlock(Block.Properties.ofFullCopy(Blocks.CAKE), () -> BnCItems.SLICE_OF_PUMPKIN_ROLL,
+            SlicedCakeBlock(blockProps("pumpkin_roll", Block.Properties.ofFullCopy(Blocks.CAKE)), () -> BnCItems.SLICE_OF_PUMPKIN_ROLL,
             4.0D, 12.0D, 6.0D, 2.0D, 14.0D);
 
     public static final Block GLOW_BERRY_MERINGUE_PIE = new
-            PieBlock(Block.Properties.ofFullCopy(Blocks.CAKE).lightLevel(state -> 7),
+            PieBlock(blockProps("glow_berry_meringue_pie", Block.Properties.ofFullCopy(Blocks.CAKE)).lightLevel(state -> 7),
             () -> BnCItems.SLICE_OF_GLOW_BERRY_MERINGUE_PIE);
 
+
+    /**
+     * 26.1 requires a block's registry id on its properties before the block is constructed, so
+     * every constant gets its id here.
+     */
+    private static BlockBehaviour.Properties blockProps(String name, BlockBehaviour.Properties properties) {
+        return properties.setId(ResourceKey.create(Registries.BLOCK, BrewinAndChewin.asResource(name)));
+    }
+
+    /**
+     * Crop-shaped properties, spelled out rather than copied from Blocks.WHEAT: 26.1's
+     * Properties#ofFullCopy also copies WHEAT's mapColor lambda, which reads {@code CropBlock.AGE}
+     * (an AGE_7) and throws for the grape bushes' AGE_2.
+     */
+    private static BlockBehaviour.Properties cropProps(String name) {
+        return BlockBehaviour.Properties.of()
+                .mapColor(MapColor.PLANT)
+                .noCollision()
+                .randomTicks()
+                .instabreak()
+                .sound(SoundType.CROP)
+                .pushReaction(PushReaction.DESTROY)
+                .setId(ResourceKey.create(Registries.BLOCK, BrewinAndChewin.asResource(name)));
+    }
 
     public static void registerAll() {
         Registry.register(BuiltInRegistries.BLOCK, BrewinAndChewin.asResource("keg"), KEG);

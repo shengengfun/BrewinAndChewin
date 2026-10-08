@@ -10,18 +10,10 @@
   "category": "meals",
   "experience": 1.0,
   "ingredients": [
-    {
-      "item": "minecraft:brown_mushroom"
-    },
-    {
-      "item": "minecraft:pumpkin_seeds"
-    },
-    {
-      "item": "minecraft:sugar"
-    },
-    {
-      "item": "brewinandchewin:rennet"
-    }
+    "minecraft:brown_mushroom",
+    "minecraft:pumpkin_seeds",
+    "minecraft:sugar",
+    "brewinandchewin:rennet"
   ],
   "result": {
     "amount": 1000,

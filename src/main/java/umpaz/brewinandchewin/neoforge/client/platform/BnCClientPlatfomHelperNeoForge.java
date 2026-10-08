@@ -8,10 +8,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.fluid.FluidTintSource;
 import net.neoforged.neoforge.fluids.FluidStack;
 import umpaz.brewinandchewin.common.BnCConfiguration;
 import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
@@ -25,13 +25,15 @@ public class BnCClientPlatfomHelperNeoForge implements BnCClientPlatformHelper {
 
     @Override
     public void renderFluidInKeg(AbstractedFluidStack stack, GuiGraphicsExtractor gui, int x, int y, float alphaModifier) {
-        IClientFluidTypeExtensions fluidTypeExtensions = IClientFluidTypeExtensions.of(stack.fluid());
         FluidStack fluidStack = (FluidStack) stack.loaderSpecific();
         if (fluidStack == null)
             return;
-        Identifier stillTexture = fluidTypeExtensions.getStillTexture(fluidStack);
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(stillTexture);
-        int tintColor = fluidTypeExtensions.getTintColor(fluidStack);
+        // 26.1 keeps fluid sprites/tints on the baked FluidModel rather than on a client
+        // FluidType extension; the models themselves are registered in BrewinAndChewinNeoForgeClient.
+        FluidModel fluidModel = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluidStack.getFluid().defaultFluidState());
+        TextureAtlasSprite sprite = fluidModel.stillMaterial().sprite();
+        FluidTintSource tintSource = fluidModel.fluidTintSource();
+        int tintColor = tintSource != null ? tintSource.color(fluidStack.getFluid().defaultFluidState()) : 0xFFFFFFFF;
 
         float alpha = ((tintColor >> 24) & 0xFF) / 255f * alphaModifier;
         float red = ((tintColor >> 16) & 0xFF) / 255f;

@@ -36,6 +36,8 @@ import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.block.entity.AgingCaskBlockEntity;
 import umpaz.brewinandchewin.common.registry.BnCBlockEntityTypes;
 import umpaz.brewinandchewin.common.utility.BnCShapeUtils;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.particles.SpellParticleOption;
 
 public class AgingCaskBlock extends BaseEntityBlock {
     public static final MapCodec<AgingCaskBlock> CODEC = simpleCodec(AgingCaskBlock::new);
@@ -79,12 +81,7 @@ public class AgingCaskBlock extends BaseEntityBlock {
     }
 
     @Override
-    public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return 0;
-    }
-
-    @Override
-    public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+    protected boolean propagatesSkylightDown(BlockState state) {
         return true;
     }
 
@@ -117,7 +114,7 @@ public class AgingCaskBlock extends BaseEntityBlock {
             return;
         if (!(level.getBlockEntity(pos) instanceof AgingCaskBlockEntity cask) || cask.countDistillates() == 0)
             return;
-        level.addParticle(ParticleTypes.EFFECT,
+        level.addParticle(SpellParticleOption.create(ParticleTypes.EFFECT, 0xFF6A00, 1.0F),
                 pos.getX() + 0.25D + random.nextDouble() * 0.5D,
                 pos.getY() + 0.9D,
                 pos.getZ() + 0.25D + random.nextDouble() * 0.5D,
@@ -125,13 +122,10 @@ public class AgingCaskBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            if (level.getBlockEntity(pos) instanceof AgingCaskBlockEntity cask) {
-                Containers.dropContents(level, pos, cask.getDroppableInventory());
-                level.updateNeighbourForOutputSignal(pos, this);
-            }
-            super.onRemove(state, level, pos, newState, isMoving);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        if (level.getBlockEntity(pos) instanceof AgingCaskBlockEntity cask) {
+            Containers.dropContents(level, pos, cask.getDroppableInventory());
+            Containers.updateNeighboursAfterDestroy(state, level, pos);
         }
     }
 
@@ -141,7 +135,7 @@ public class AgingCaskBlock extends BaseEntityBlock {
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         if (level.getBlockEntity(pos) instanceof AgingCaskBlockEntity cask && !cask.getWine().isEmpty()) {
             return Math.min(15, 1 + cask.countDistillates() * 2);
         }

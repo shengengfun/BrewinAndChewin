@@ -9,16 +9,9 @@
   },
   "experience": 1.0,
   "ingredients": [
-    {
-      "item": "minecraft:sea_pickle"
-    },
-    {
-      "item": "minecraft:dried_kelp"
-    },
-    {
-      "item": "minecraft:seagrass"
-    },
-    []
+    "minecraft:sea_pickle",
+    "minecraft:dried_kelp",
+    "minecraft:seagrass"
   ],
   "result": {
     "amount": 1000,

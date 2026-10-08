@@ -32,6 +32,8 @@ import umpaz.brewinandchewin.common.utility.BnCWineUtils;
 
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.Item;
 
 public class WineItem extends Item {
     public static final int DRINK_DURATION = 32;
@@ -57,11 +59,11 @@ public class WineItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag flag) {
         if (BnCLabelUtils.hidesEffects(stack))
             return;
         List<MobEffectInstance> effects = BnCWineUtils.getDrinkEffects(this.type, BnCWineUtils.getContents(stack));
-        PotionContents.addPotionTooltip(effects, tooltip::add, 1.0F, context.tickRate());
+        PotionContents.addPotionTooltip(effects, tooltip::accept, 1.0F, context.tickRate());
     }
 
     @Override
@@ -72,11 +74,6 @@ public class WineItem extends Item {
     @Override
     public ItemUseAnimation getUseAnimation(ItemStack stack) {
         return ItemUseAnimation.DRINK;
-    }
-
-    @Override
-    public SoundEvent getEatingSound() {
-        return SoundEvents.GENERIC_DRINK.value();
     }
 
     @Override
@@ -91,7 +88,7 @@ public class WineItem extends Item {
             } else {
                 for (MobEffectInstance instance : effects) {
                     if (instance.getEffect().value().isInstantenous()) {
-                        instance.getEffect().value().applyInstantenousEffect(null, null, consumer, instance.getAmplifier(), 1.0D);
+                        instance.getEffect().value().applyInstantenousEffect((net.minecraft.server.level.ServerLevel) level, null, null, consumer, instance.getAmplifier(), 1.0D);
                     } else if (instance.is(BnCEffects.TIPSY)) {
                         applyTipsy(consumer, instance);
                     } else {
@@ -155,7 +152,7 @@ public class WineItem extends Item {
                 .filter(instance -> !instance.is(BnCEffects.TIPSY))
                 .map(MobEffectInstance::new)
                 .toList();
-        cloud.setPotionContents(new PotionContents(Optional.empty(), Optional.empty(), cloudEffects));
+        cloud.setPotionContents(new PotionContents(Optional.empty(), Optional.empty(), cloudEffects, Optional.empty()));
         level.addFreshEntity(cloud);
 
         consumer.removeAllEffects();

@@ -2,15 +2,10 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "brewinandchewin:cornmeal"
-    },
-    {
-      "tag": "c:eggs"
-    }
+    "brewinandchewin:cornmeal",
+    "#c:eggs"
   ],
   "result": {
-    "count": 1,
     "id": "brewinandchewin:corn_dough"
   }
 }

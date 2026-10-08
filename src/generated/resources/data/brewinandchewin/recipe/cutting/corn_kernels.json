@@ -1,19 +1,14 @@
 {
   "type": "farmersdelight:cutting",
   "ingredients": [
-    {
-      "item": "brewinandchewin:corn_kernels"
-    }
+    "brewinandchewin:corn_kernels"
   ],
   "result": [
     {
       "item": {
-        "count": 1,
         "id": "brewinandchewin:cornmeal"
       }
     }
   ],
-  "tool": {
-    "tag": "c:tools/knife"
-  }
+  "tool": "#c:tools/knife"
 }

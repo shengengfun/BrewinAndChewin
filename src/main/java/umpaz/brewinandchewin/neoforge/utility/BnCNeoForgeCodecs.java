@@ -9,10 +9,11 @@ import net.minecraft.core.component.PatchedDataComponentMap;
 import net.neoforged.neoforge.fluids.FluidStack;
 import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
 import umpaz.brewinandchewin.common.utility.FluidUnit;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class BnCNeoForgeCodecs {
     public static final Codec<AbstractedFluidStack> FLUID_STACK_WRAPPER = RecordCodecBuilder.create(inst -> inst.group(
-                    FluidStack.FLUID_NON_EMPTY_CODEC.fieldOf("id").forGetter(stack -> stack.fluid().builtInRegistryHolder()),
+                    BuiltInRegistries.FLUID.holderByNameCodec().fieldOf("id").forGetter(stack -> stack.fluid().builtInRegistryHolder()),
                     Codec.LONG.validate(l -> {
                         if (l < 1)
                             return DataResult.error(() -> "Fluid amount must be positive");

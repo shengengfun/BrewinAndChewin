@@ -1,11 +1,14 @@
 package umpaz.brewinandchewin.data.recipe;
 
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
-import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.registry.BnCItems;
 
@@ -16,7 +19,7 @@ public class BnCCookingRecipes {
 
     public static final float SMALL_EXP = 0.35F;
 
-    public static void register(RecipeOutput consumer) {
+    public static void register(RecipeOutput consumer, HolderGetter<Item> items) {
         foodSmelting(consumer, BnCItems.RAW_CROISSANT, BnCItems.CROISSANT, "croissant");
         foodSmelting(consumer, BnCItems.RAW_SAUSAGE, BnCItems.COOKED_SAUSAGE, "cooked_sausage");
         foodSmelting(consumer, BnCItems.CORN, BnCItems.COOKED_CORN, "cooked_corn");
@@ -31,7 +34,7 @@ public class BnCCookingRecipes {
     }
 
     private static void ovenOnly(RecipeOutput consumer, ItemLike input, ItemLike result, String name) {
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(input), RecipeCategory.FOOD, result, SMALL_EXP, SMELTING_TIME)
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(input), RecipeCategory.FOOD, CookingBookCategory.FOOD, result, SMALL_EXP, SMELTING_TIME)
                 .unlockedBy("has_" + name, InventoryChangeTrigger.TriggerInstance.hasItems(input))
                 .save(consumer, BrewinAndChewin.asResource(name + "_from_smelting").toString());
         SimpleCookingRecipeBuilder.smoking(Ingredient.of(input), RecipeCategory.FOOD, result, SMALL_EXP, SMOKING_TIME)

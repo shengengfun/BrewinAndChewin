@@ -10,19 +10,11 @@
   "category": "meals",
   "experience": 1.0,
   "ingredients": [
-    {
-      "item": "minecraft:sugar"
-    },
-    {
-      "item": "minecraft:cocoa_beans"
-    },
-    {
-      "item": "minecraft:cocoa_beans"
-    },
-    []
+    "minecraft:sugar",
+    "minecraft:cocoa_beans",
+    "minecraft:cocoa_beans"
   ],
   "result": {
-    "count": 1,
     "id": "brewinandchewin:cocoa_fudge"
   },
   "temperature": 2,

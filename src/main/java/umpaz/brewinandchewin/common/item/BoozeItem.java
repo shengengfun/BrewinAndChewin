@@ -20,11 +20,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.registry.BnCEffects;
+import umpaz.brewinandchewin.common.utility.BnCFoodUtils;
 import vectorwing.farmersdelight.common.utility.TextUtils;
 
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.Item;
 
 public class BoozeItem extends Item {
     private final Supplier<Fluid> fluid;
@@ -67,15 +70,10 @@ public class BoozeItem extends Item {
     }
 
     @Override
-    public String getDescriptionId() {
-        return this.getOrCreateDescriptionId();
-    }
-
-    @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity consumer) {
         if (!level.isClientSide()) {
-            var tipsy = BrewinAndChewin.getHelper().getFoodProperties(stack, consumer).effects().stream().filter(pair -> pair.effect().getEffect() == BnCEffects.TIPSY).findFirst();
-            this.affectConsumer(consumer, tipsy.map(pair -> pair.effect().getDuration()).orElse(0), tipsy.map(pair -> pair.effect().getAmplifier()).orElse(-1));
+            var tipsy = BnCFoodUtils.getEffects(stack).stream().filter(effect -> effect.getEffect().value() == BnCEffects.TIPSY).findFirst();
+            this.affectConsumer(consumer, tipsy.map(MobEffectInstance::getDuration).orElse(0), tipsy.map(MobEffectInstance::getAmplifier).orElse(-1));
         }
         ItemStack containerStack = BrewinAndChewin.getHelper().getCraftingRemainingItem(stack);
         Player player;
@@ -106,11 +104,6 @@ public class BoozeItem extends Item {
         }
     }
 
-    @Override
-    public SoundEvent getEatingSound() {
-        return SoundEvents.GENERIC_DRINK.value();
-    }
-
     //Tipsy Stuff
     public void affectConsumer(LivingEntity consumer, int duration, int potency) {
        if (consumer.hasEffect(BnCEffects.TIPSY)) {
@@ -122,15 +115,9 @@ public class BoozeItem extends Item {
     public static final Set<Supplier<Holder<MobEffect>>> RED_EFFECTS = Set.of(() -> BnCEffects.TIPSY, () -> MobEffects.BAD_OMEN);
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag isAdvanced) {
         if (!BrewinAndChewin.getHelper().hasFoodEffectTooltip())
             return;
-        TextUtils.addFoodEffectTooltip(stack, tooltip::add, 1.0F, context.tickRate());
-        for (int i = 0; i < tooltip.size(); ++i) {
-            Component component = tooltip.get(i);
-            if (RED_EFFECTS.stream().anyMatch(holder -> component.contains(Component.translatable(holder.get().value().getDescriptionId())))) {
-                tooltip.set(i, component.copy().withStyle(ChatFormatting.RED));
-            }
-        }
+        TextUtils.addFoodEffectTooltip(stack, tooltip::accept, 1.0F, context.tickRate());
     }
 }

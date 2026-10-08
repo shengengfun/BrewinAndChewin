@@ -119,7 +119,7 @@ public class TankardItemFluidHandlerNeoForge implements IFluidHandlerItem {
     public int fill(FluidStack resource, FluidAction action) {
         int fillAmount = Math.min(capacity - fluid.getAmount(), resource.getAmount());
         if (action.execute()) {
-            fluid = new FluidStack(resource.getFluidHolder(), fluid.getAmount() + fillAmount);
+            fluid = new FluidStack(resource.typeHolder(), fluid.getAmount() + fillAmount);
             if (fluid.getAmount() >= capacity) {
                 ItemStack newItem = convertToBrew(fluid);
 
@@ -133,7 +133,7 @@ public class TankardItemFluidHandlerNeoForge implements IFluidHandlerItem {
 
     @Override
     public FluidStack drain(FluidStack resource, FluidAction action) {
-        if (!fluid.isFluidEqual(resource)) return FluidStack.EMPTY;
+        if (!FluidStack.isSameFluid(fluid, resource)) return FluidStack.EMPTY;
         return drain(resource.getAmount(), action);
     }
 
@@ -145,7 +145,7 @@ public class TankardItemFluidHandlerNeoForge implements IFluidHandlerItem {
         if (current.isEmpty()) return FluidStack.EMPTY;
 
         int drained = Math.min(maxDrain, current.getAmount());
-        FluidStack result = new FluidStack(flowingriver.getFluidHolder(), drained);
+        FluidStack result = new FluidStack(flowingriver.typeHolder(), drained);
 
         if (action.execute()) {
             if (container.getItem() != BnCItems.TANKARD) {

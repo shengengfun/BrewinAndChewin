@@ -5,9 +5,13 @@ import net.minecraft.core.component.PatchedDataComponentMap;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.FluidResourceHandlerItemAdapter;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import umpaz.brewinandchewin.common.container.AbstractedFluidTank;
 import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
 import umpaz.brewinandchewin.common.utility.FluidUnit;
@@ -16,7 +20,9 @@ public class KegFluidItemStorageNeoForge implements AbstractedFluidTank {
     private final IFluidHandlerItem storage;
 
     public KegFluidItemStorageNeoForge(ItemStack stack) {
-        storage = Capabilities.FluidHandler.ITEM.getCapability(stack, null);
+        ItemAccess access = ItemAccess.forStack(stack);
+        ResourceHandler<FluidResource> handler = Capabilities.Fluid.ITEM.getCapability(stack, access);
+        storage = handler == null ? null : new FluidResourceHandlerItemAdapter(handler, access);
     }
 
     @Override

@@ -1,7 +1,10 @@
 package umpaz.brewinandchewin.data;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.core.component.DataComponentInitializers;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -32,7 +35,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public class BnCDataGenerators {
 
-    public static void gatherData(GatherDataEvent event) {
+    @net.neoforged.bus.api.SubscribeEvent
+    public static void gatherData(GatherDataEvent.Server event) {
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
@@ -51,6 +55,21 @@ public class BnCDataGenerators {
         );
         event.addProvider(builtInEntries);
         lookupProvider = builtInEntries.getRegistryProvider();
+
+        // 26.1 binds an item's default components from a data-driven pass that normally only runs
+        // when a server/client reloads its registries. Datagen never does that, so item components
+        // stay unbound and any ItemStack creation throws - run the same pass here. Tag-backed
+        // components resolve to an empty HolderSet at this point (no tag data is loaded yet), which
+        // trips NeoForge's dev-only "components must implement equals/hashCode" check, so that check
+        // is suspended for the duration. It has no effect outside the datagen process.
+        boolean inIde = SharedConstants.IS_RUNNING_IN_IDE;
+        SharedConstants.IS_RUNNING_IN_IDE = false;
+        try {
+            BuiltInRegistries.DATA_COMPONENT_INITIALIZERS.build(lookupProvider.join())
+                    .forEach(DataComponentInitializers.PendingComponents::apply);
+        } finally {
+            SharedConstants.IS_RUNNING_IN_IDE = inIde;
+        }
 
         event.addProvider(new BnCBlockTags(output, lookupProvider));
         event.addProvider(new BnCItemTags(output, lookupProvider));

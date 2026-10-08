@@ -27,6 +27,8 @@ import vectorwing.farmersdelight.common.block.entity.SyncedBlockEntity;
 
 import static umpaz.brewinandchewin.common.block.CoasterBlock.INVISIBLE;
 import static umpaz.brewinandchewin.common.block.CoasterBlock.SIZE;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class CoasterBlockEntity extends SyncedBlockEntity implements Clearable {
 

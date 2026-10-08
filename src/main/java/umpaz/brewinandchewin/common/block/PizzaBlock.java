@@ -49,7 +49,7 @@ public class PizzaBlock extends Block
 
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             if (this.takeServing(level, pos, state, player, player.getUsedItemHand()).consumesAction()) {
                 return InteractionResult.SUCCESS;
             }
@@ -97,7 +97,7 @@ public class PizzaBlock extends Block
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState blockState, Level worldIn, BlockPos pos, Direction direction) {
         return blockState.getValue(SERVINGS);
     }
 

@@ -85,7 +85,7 @@ public class BnCCommonEvents {
 
     @SubscribeEvent
     public static void mobEffectApplicable(MobEffectEvent.Applicable event) {
-        if (event.getEntity().getType().is(BnCTags.EntityTypes.IMMUNE_TO_INTOXICATION) && event.getEffectInstance().is(BnCEffects.INTOXICATION))
+        if (event.getEntity().getType().builtInRegistryHolder().is(BnCTags.EntityTypes.IMMUNE_TO_INTOXICATION) && event.getEffectInstance().is(BnCEffects.INTOXICATION))
             event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
     }
 

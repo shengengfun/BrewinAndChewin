@@ -6,8 +6,8 @@ import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 
 public class DrunkBubbleParticle extends SingleQuadParticle {
-   protected DrunkBubbleParticle( ClientLevel level, double x, double y, double z, double motionX, double motionY, double motionZ ) {
-      super(level, x, y, z);
+   protected DrunkBubbleParticle( ClientLevel level, double x, double y, double z, double motionX, double motionY, double motionZ, net.minecraft.client.renderer.texture.TextureAtlasSprite sprite ) {
+      super(level, x, y, z, sprite);
       this.scale(2.0F);
       this.setSize(0.25F, 0.25F);
 
@@ -54,11 +54,10 @@ public class DrunkBubbleParticle extends SingleQuadParticle {
 
       @Override
       public Particle createParticle( DrunkBubbleParticleOptions typeIn, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random ) {
-         DrunkBubbleParticle particle = new DrunkBubbleParticle(level, x, y + 0.3D, z, 0.0, 0.002, 0.0);
+         DrunkBubbleParticle particle = new DrunkBubbleParticle(level, x, y + 0.3D, z, 0.0, 0.002, 0.0, this.spriteSet.get(random));
          particle.setAlpha(0.6F);
          particle.setColor(typeIn.getColor().x, typeIn.getColor().y, typeIn.getColor().z);
          particle.scale(typeIn.getScale());
-         particle.setSprite(this.spriteSet.get(random));
          return particle;
       }
    }

@@ -1,6 +1,7 @@
 package umpaz.brewinandchewin.common.attachment;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.Identifier;
@@ -20,7 +21,7 @@ import java.util.Optional;
 public class RagingAttachment {
     public static final float RESET_TICK_MULTIPLIER = 2.5F;
     public static final Identifier ID = BrewinAndChewin.asResource("raging");
-    public static final Codec<RagingAttachment> CODEC = RecordCodecBuilder.create(inst -> inst.group(
+    public static final MapCodec<RagingAttachment> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
             Codec.INT.fieldOf("stacks").forGetter(RagingAttachment::getStacks),
             Codec.INT.fieldOf("ticks_until_reset").forGetter(RagingAttachment::getTicksUntilReset)
     ).apply(inst, RagingAttachment::new));

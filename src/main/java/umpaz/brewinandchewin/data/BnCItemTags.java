@@ -130,8 +130,6 @@ public class BnCItemTags extends IntrinsicHolderTagsProvider<Item> {
     }
 
     private void registerConventionalTags() {
-        tag(ItemTags.DYEABLE)
-                .add(BnCItems.LABEL);
         tag(Tags.Items.FOODS_FRUIT)
                 .add(BnCItems.RED_GRAPES)
                 .add(BnCItems.WHITE_GRAPES);
@@ -177,9 +175,11 @@ public class BnCItemTags extends IntrinsicHolderTagsProvider<Item> {
                 .add(BnCItems.RICH_CHOCOLATE_CAKE)
                 .add(BnCItems.PUMPKIN_ROLL)
                 .add(BnCItems.GLOW_BERRY_MERINGUE_PIE);
-        tag(Tags.Items.FOODS)
-                .addOptional(NMLIntegration.RICE_PUDDING_ITEM)
-                .addOptional(NMLIntegration.MAPLE_FUDGE_ITEM);
+        // 26.1 TagAppender#addOptional only takes the registry value, so optional entries go through the raw builder.
+        getOrCreateRawBuilder(Tags.Items.FOODS)
+                .addOptionalElement(NMLIntegration.RICE_PUDDING_ITEM);
+        getOrCreateRawBuilder(Tags.Items.FOODS)
+                .addOptionalElement(NMLIntegration.MAPLE_FUDGE_ITEM);
         tag(Tags.Items.FOODS_PIE)
                 .add(BnCItems.GLOW_BERRY_MERINGUE_PIE);
         tag(Tags.Items.FOODS_CANDY)

@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 public record FluidItemComponentRemapper(ItemStack baseItem,
                                          Map<DataComponentType<?>, Pair<DataComponentType<?>, Map<List<TagReference>, List<TagReference>>>> map) {
     public static final Codec<FluidItemComponentRemapper> DIRECT_CODEC = RecordCodecBuilder.create(inst -> inst.group(
-            ItemStack.STRICT_SINGLE_ITEM_CODEC.fieldOf("base").forGetter(FluidItemComponentRemapper::baseItem),
+            ItemStack.CODEC.fieldOf("base").forGetter(FluidItemComponentRemapper::baseItem),
             Codec.unboundedMap(BuiltInRegistries.DATA_COMPONENT_TYPE.byNameCodec(), ValueCodec.INSTANCE).optionalFieldOf("remaps", Map.of()).forGetter(FluidItemComponentRemapper::map)
     ).apply(inst, FluidItemComponentRemapper::new));
-    public static final Codec<FluidItemComponentRemapper> CODEC = Codec.withAlternative(DIRECT_CODEC, Codec.withAlternative(ItemStack.STRICT_SINGLE_ITEM_CODEC, BuiltInRegistries.ITEM.byNameCodec(), ItemStack::new), stack -> new FluidItemComponentRemapper(stack, Map.of()));
+    public static final Codec<FluidItemComponentRemapper> CODEC = Codec.withAlternative(DIRECT_CODEC, Codec.withAlternative(ItemStack.CODEC, BuiltInRegistries.ITEM.byNameCodec(), ItemStack::new), stack -> new FluidItemComponentRemapper(stack, Map.of()));
 
     public ItemStack convert(HolderLookup.Provider lookup, AbstractedFluidStack fluid) throws IllegalStateException {
         ItemStack stack = baseItem.copy();

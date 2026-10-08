@@ -61,7 +61,7 @@ public class UnripeCheeseWheelBlock extends Block {
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             if (level.getRandom().nextFloat() <= RIPEN_CHANCE) {
                 if (state.getValue(AGE) == 0) {
                     level.setBlock(pos, state.setValue(AGE, 1), 3); // next stage

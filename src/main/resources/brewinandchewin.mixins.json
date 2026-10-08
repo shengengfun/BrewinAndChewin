@@ -4,6 +4,7 @@
   "plugin": "umpaz.brewinandchewin.BnCMixinConfigPlugin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "ContextMapAccessor",
     "DataFixTypesAccessor",
     "DataFixTypesMixin",
     "IntoxicationCancelSaturationMixin",
@@ -17,21 +18,12 @@
     "PlayerMixin",
     "RopeBlockMixin",
     "ServerGamePacketListenerImplMixin",
-    "ServerPlaceRecipeAccessor",
     "ServerRecipeBookMixin",
     "StoreLootParamsMixin$LootParamsBuilderMixin",
     "StoreLootParamsMixin$LootParamsMixin"
   ],
   "client": [
-    "client.ChatListenerMixin",
-    "client.GhostRecipeAccessor",
-    "client.GuiMixin",
-    "client.LevelRendererAccessor",
-    "client.RecipeBookComponentAccessor",
-    "client.TipsyDrunkRendererMixin",
-    "client.TipsySignRendererMixin$TipsyCanvasSignRenderMixin",
-    "client.TipsySignRendererMixin$TipsySignRenderMixin",
-    "client.integration.appleskin.HUDOverlayHandlerMixin"
+    "client.ChatListenerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

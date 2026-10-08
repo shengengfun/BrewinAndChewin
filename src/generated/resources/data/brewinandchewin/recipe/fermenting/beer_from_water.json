@@ -9,16 +9,9 @@
   },
   "experience": 1.0,
   "ingredients": [
-    {
-      "tag": "c:foods/dough/wheat"
-    },
-    {
-      "item": "minecraft:wheat_seeds"
-    },
-    {
-      "item": "minecraft:brown_mushroom"
-    },
-    []
+    "#c:foods/dough/wheat",
+    "minecraft:wheat_seeds",
+    "minecraft:brown_mushroom"
   ],
   "result": {
     "amount": 1000,

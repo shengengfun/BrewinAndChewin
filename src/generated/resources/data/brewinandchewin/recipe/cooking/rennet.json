@@ -2,15 +2,10 @@
   "type": "farmersdelight:cooking",
   "experience": 0.35,
   "ingredients": [
-    {
-      "item": "brewinandchewin:innards"
-    },
-    {
-      "item": "brewinandchewin:innards"
-    }
+    "brewinandchewin:innards",
+    "brewinandchewin:innards"
   ],
   "result": {
-    "count": 1,
     "id": "brewinandchewin:rennet"
   }
 }

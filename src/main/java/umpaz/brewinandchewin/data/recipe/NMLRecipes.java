@@ -1,7 +1,10 @@
 package umpaz.brewinandchewin.data.recipe;
 
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -25,7 +28,7 @@ public class NMLRecipes {
     public static final int COLD_TIER = 1;
     public static final int BOTTLE = 250;
 
-    public static void register(RecipeOutput output) {
+    public static void register(RecipeOutput output, HolderGetter<Item> items, HolderGetter<Fluid> fluidTags) {
         Item walnuts = item(NMLIntegration.WALNUTS);
         Item mapleSyrup = item(NMLIntegration.MAPLE_SYRUP_BOTTLE);
         Item thistle = item(NMLIntegration.THISTLE);
@@ -36,7 +39,7 @@ public class NMLRecipes {
 
         RecipeOutput conditional = output.withConditions(new ModLoadedCondition(NMLIntegration.MOD_ID));
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, item(NMLIntegration.RICE_PUDDING_ITEM))
+        ShapelessRecipeBuilder.shapeless(items, RecipeCategory.FOOD, item(NMLIntegration.RICE_PUDDING_ITEM))
                 .requires(ModItems.COOKED_RICE.get())
                 .requires(BnCItems.SWEET_BERRY_JAM)
                 .requires(walnuts)
@@ -44,7 +47,7 @@ public class NMLRecipes {
                 .unlockedBy("has_walnuts", InventoryChangeTrigger.TriggerInstance.hasItems(walnuts))
                 .save(conditional, BrewinAndChewin.asResource("rice_pudding").toString());
 
-        KegFermentingRecipeBuilder.kegFermentingRecipe(FermentingBookCategory.MEALS, item(NMLIntegration.MAPLE_FUDGE_ITEM), 2, KegFermentingRecipes.MEDIUM_EXP, COLD_TIER)
+        KegFermentingRecipeBuilder.kegFermentingRecipe(items, fluidTags, FermentingBookCategory.MEALS, item(NMLIntegration.MAPLE_FUDGE_ITEM), 2, KegFermentingRecipes.MEDIUM_EXP, COLD_TIER)
                 .addFluidIngredient(Tags.Fluids.MILK, BOTTLE, FluidUnit.MILLIBUCKET)
                 .setFluidUnit(FluidUnit.MILLIBUCKET)
                 .addIngredient(Ingredient.of(Items.SUGAR), 2)
@@ -52,7 +55,7 @@ public class NMLRecipes {
                 .unlockedByItems("has_maple_syrup", mapleSyrup)
                 .build(conditional, BrewinAndChewin.asResource("fermenting/maple_fudge_from_milk"));
 
-        BnCCookingPotRecipeBuilder.cookingPotRecipe(BnCItems.RENNET, 1, BnCCookingPotRecipes.NORMAL_COOKING, BnCCookingPotRecipes.SMALL_EXP)
+        BnCCookingPotRecipeBuilder.cookingPotRecipe(items, BnCItems.RENNET, 1, BnCCookingPotRecipes.NORMAL_COOKING, BnCCookingPotRecipes.SMALL_EXP)
                 .addIngredient(Ingredient.of(thistle), 6)
                 .setRecipeBookTab(CookingPotRecipeBookTab.MISC)
                 .unlockedByItems("has_thistle", thistle)
@@ -60,7 +63,7 @@ public class NMLRecipes {
     }
 
     private static Item item(Identifier id) {
-        Item found = BuiltInRegistries.ITEM.get(id);
-        return found == Items.AIR ? null : found;
+        Item found = BuiltInRegistries.ITEM.getValue(id);
+        return found == null || found == Items.AIR ? null : found;
     }
 }

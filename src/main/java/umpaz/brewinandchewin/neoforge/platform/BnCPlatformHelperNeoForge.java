@@ -81,7 +81,7 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLLoader.isProduction();
+        return !net.neoforged.fml.loading.FMLEnvironment.isProduction();
     }
 
     @Override
@@ -100,7 +100,7 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
 
     @Override
     public void sendServerbound(CustomPacketPayload payload) {
-        PacketDistributor.sendToServer(payload);
+        net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(payload);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
     }
 
     @Override
-    public Slot createKegSlot(AbstractedItemHandler inventory, int slot, int x, int y, boolean canInsert, @Nullable Pair<Identifier, Identifier> noItemIcon) {
+    public Slot createKegSlot(AbstractedItemHandler inventory, int slot, int x, int y, boolean canInsert, @Nullable Identifier noItemIcon) {
         return new SlotItemHandler((IItemHandler)inventory, slot, x, y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -150,7 +150,7 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
             }
 
             @Override
-            public @Nullable Pair<Identifier, Identifier> getNoItemIcon() {
+            public @Nullable Identifier getNoItemIcon() {
                 return noItemIcon;
             }
         };
@@ -219,7 +219,8 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
 
     @Override
     public ItemStack getCraftingRemainingItem(ItemStack stack) {
-        return stack.getCraftingRemainingItem();
+        var remainder = stack.get(net.minecraft.core.component.DataComponents.USE_REMAINDER);
+        return remainder == null ? ItemStack.EMPTY : remainder.convertInto().create();
     }
 
     @Override
@@ -234,12 +235,12 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
 
     @Override
     public boolean isEdible(ItemStack stack, LivingEntity entity) {
-        return stack.getFoodProperties(entity) != null;
+        return stack.get(net.minecraft.core.component.DataComponents.FOOD) != null;
     }
 
     @Override
     public FoodProperties getFoodProperties(ItemStack stack, LivingEntity entity) {
-        return stack.getFoodProperties(entity);
+        return stack.get(net.minecraft.core.component.DataComponents.FOOD);
     }
 
     @Override
@@ -287,7 +288,7 @@ public class BnCPlatformHelperNeoForge implements BnCPlatformHelper {
 
     @Override
     public AbstractedFluidTank getFluidContainerFromItem(ItemStack stack) {
-        if (Capabilities.FluidHandler.ITEM.getCapability(stack, null) == null)
+        if (Capabilities.Fluid.ITEM.getCapability(stack, net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack)) == null)
             return null;
         return new KegFluidItemStorageNeoForge(stack);
     }

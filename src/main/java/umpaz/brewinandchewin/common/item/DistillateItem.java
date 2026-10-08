@@ -22,6 +22,8 @@ import umpaz.brewinandchewin.common.registry.BnCEffects;
 import umpaz.brewinandchewin.common.utility.BnCLabelUtils;
 
 import java.util.List;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.Item;
 
 public class DistillateItem extends Item implements Distillate {
     public static final int DRINK_DURATION = 32;
@@ -67,21 +69,16 @@ public class DistillateItem extends Item implements Distillate {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag flag) {
         if (this.tipsyBonus <= 0 || BnCLabelUtils.hidesEffects(stack))
             return;
         List<MobEffectInstance> effects = List.of(new MobEffectInstance(BnCEffects.TIPSY, this.tipsyDuration, this.tipsyBonus - 1));
-        PotionContents.addPotionTooltip(effects, tooltip::add, 1.0F, context.tickRate());
+        PotionContents.addPotionTooltip(effects, tooltip::accept, 1.0F, context.tickRate());
     }
 
     @Override
     public ItemUseAnimation getUseAnimation(ItemStack stack) {
         return ItemUseAnimation.DRINK;
-    }
-
-    @Override
-    public SoundEvent getEatingSound() {
-        return SoundEvents.GENERIC_DRINK.value();
     }
 
     @Override

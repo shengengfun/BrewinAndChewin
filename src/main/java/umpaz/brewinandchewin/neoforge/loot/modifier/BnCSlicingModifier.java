@@ -31,8 +31,8 @@ public class BnCSlicingModifier extends LootModifier
 
     private final Item slice;
 
-    protected BnCSlicingModifier(LootItemCondition[] conditionsIn, Item sliceIn) {
-        super(conditionsIn);
+    protected BnCSlicingModifier(LootItemCondition[] conditionsIn, int priority, Item sliceIn) {
+        super(conditionsIn, priority);
         this.slice = sliceIn;
     }
 
@@ -48,7 +48,7 @@ public class BnCSlicingModifier extends LootModifier
             }
             else if (targetBlock instanceof CheeseWheelBlock) {
                     int servings = state.getValue(CheeseWheelBlock.SERVINGS);
-                if (servings == 3 && !context.getParam(LootContextParams.TOOL).is(CommonTags.Items.TOOLS_KNIFE)) {
+                if (servings == 3 && !context.getParameter(LootContextParams.TOOL).is(CommonTags.Items.TOOLS_KNIFE)) {
                     generatedLoot.add(new ItemStack(targetBlock.asItem()));
                 }
                 else {

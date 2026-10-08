@@ -10,6 +10,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import umpaz.brewinandchewin.common.registry.BnCBlockEntityTypes;
 import vectorwing.farmersdelight.common.block.entity.SyncedBlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class BottleRackBlockEntity extends SyncedBlockEntity implements Clearable {
     public static final int SLOT_COUNT = 9;

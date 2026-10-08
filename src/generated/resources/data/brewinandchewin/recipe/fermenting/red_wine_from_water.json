@@ -9,16 +9,9 @@
   },
   "experience": 1.0,
   "ingredients": [
-    {
-      "item": "brewinandchewin:red_grapes"
-    },
-    {
-      "item": "brewinandchewin:red_grapes"
-    },
-    {
-      "item": "brewinandchewin:red_grapes"
-    },
-    []
+    "brewinandchewin:red_grapes",
+    "brewinandchewin:red_grapes",
+    "brewinandchewin:red_grapes"
   ],
   "result": {
     "amount": 1000,

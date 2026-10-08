@@ -9,9 +9,11 @@ import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -19,6 +21,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -31,49 +34,57 @@ import umpaz.brewinandchewin.common.crafting.FermentingBookCategory;
 import umpaz.brewinandchewin.common.utility.FluidUnit;
 import umpaz.brewinandchewin.neoforge.utility.KegCompatibleFluidIngredients;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import net.minecraft.world.item.ItemStackTemplate;
 
 public class KegFermentingRecipeBuilder {
-    private int ingredientCount = 0;
-    private final NonNullList<Ingredient> ingredients = NonNullList.withSize(4, Ingredient.EMPTY);
+    private final HolderGetter<Item> items;
+    private final HolderGetter<Fluid> fluids;
+    private final List<Ingredient> ingredients = new ArrayList<>();
     private final FermentingBookCategory tab;
 
     private Optional<FluidIngredientWithAmount> fluidIngredient = Optional.empty();
     private Optional<FluidUnit> unit = Optional.empty();
-    private Either<AbstractedFluidStack, ItemStack> result = null;
+    // 26.1 binds item components only after the mod's registries are frozen, so datagen must
+    // not materialise an ItemStack here - the template is expanded at runtime instead.
+    private Either<AbstractedFluidStack, ItemStackTemplate> result = null;
     private final float experience;
     private final int temperature;
     private final int amount;
 
     private final Advancement.Builder advancement = Advancement.Builder.advancement();
 
-    private KegFermentingRecipeBuilder(FermentingBookCategory tab, int amount, float experience, int temperature) {
+    private KegFermentingRecipeBuilder(HolderGetter<Item> items, HolderGetter<Fluid> fluids, FermentingBookCategory tab, int amount, float experience, int temperature) {
+        this.items = items;
+        this.fluids = fluids;
         this.tab = tab;
         this.experience = experience;
         this.temperature = temperature;
         this.amount = amount;
     }
 
-    public static KegFermentingRecipeBuilder kegFermentingRecipe(FermentingBookCategory tab, Item item, int amount, float experience, int temperature) {
-        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(tab, amount, experience, temperature);
+    public static KegFermentingRecipeBuilder kegFermentingRecipe(HolderGetter<Item> items, HolderGetter<Fluid> fluids, FermentingBookCategory tab, Item item, int amount, float experience, int temperature) {
+        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(items, fluids, tab, amount, experience, temperature);
         i.setResult(item);
         return i;
     }
 
-    public static KegFermentingRecipeBuilder kegFermentingRecipe(FermentingBookCategory tab, Fluid fluid, int amount, float experience, int temperature) {
-        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(tab, amount, experience, temperature);
+    public static KegFermentingRecipeBuilder kegFermentingRecipe(HolderGetter<Item> items, HolderGetter<Fluid> fluids, FermentingBookCategory tab, Fluid fluid, int amount, float experience, int temperature) {
+        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(items, fluids, tab, amount, experience, temperature);
         i.setResult(fluid);
         return i;
     }
 
-    public static KegFermentingRecipeBuilder kegFermentingRecipe(FermentingBookCategory tab, Item item, int amount, float experience) {
-        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(tab, amount, experience, 3);
+    public static KegFermentingRecipeBuilder kegFermentingRecipe(HolderGetter<Item> items, HolderGetter<Fluid> fluids, FermentingBookCategory tab, Item item, int amount, float experience) {
+        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(items, fluids, tab, amount, experience, 3);
         i.setResult(item);
         return i;
     }
 
-    public static KegFermentingRecipeBuilder kegFermentingRecipe(FermentingBookCategory tab, Fluid fluid, int amount, float experience) {
-        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(tab, amount, experience, 3);
+    public static KegFermentingRecipeBuilder kegFermentingRecipe(HolderGetter<Item> items, HolderGetter<Fluid> fluids, FermentingBookCategory tab, Fluid fluid, int amount, float experience) {
+        KegFermentingRecipeBuilder i = new KegFermentingRecipeBuilder(items, fluids, tab, amount, experience, 3);
         i.setResult(fluid);
         return i;
     }
@@ -100,16 +111,16 @@ public class KegFermentingRecipeBuilder {
     }
 
     private void setResult(Item item) {
-        result = Either.right(item.getDefaultInstance().copyWithCount(amount));
+        result = Either.right(new ItemStackTemplate(item, amount));
     }
 
     private void setResult(ItemStack stack) {
-        result = Either.right(stack.copyWithCount(amount));
+        result = Either.right(ItemStackTemplate.fromNonEmptyStack(stack).withCount(amount));
     }
 
 
     public KegFermentingRecipeBuilder addIngredient(TagKey<Item> tagIn) {
-        return addIngredient(Ingredient.of(tagIn));
+        return addIngredient(Ingredient.of(items.getOrThrow(tagIn)));
     }
 
     public KegFermentingRecipeBuilder addIngredient(ItemLike itemIn) {
@@ -127,8 +138,7 @@ public class KegFermentingRecipeBuilder {
 
     public KegFermentingRecipeBuilder addIngredient(Ingredient ingredientIn, int quantity) {
         for (int i = 0; i < quantity; ++i) {
-            ingredients.set(ingredientCount, ingredientIn);
-            ++ingredientCount;
+            ingredients.add(ingredientIn);
         }
         return this;
     }
@@ -154,16 +164,16 @@ public class KegFermentingRecipeBuilder {
         if (result.right().isPresent()) {
             if (fluidIngredient.isPresent() && fluidIngredient.get().ingredient() instanceof KegCompatibleFluidIngredients.Exact exact && !exact.displayStacks().isEmpty()) {
                 Identifier baseFluidLocation = BuiltInRegistries.FLUID.getKey(exact.displayStacks().getFirst().fluid());
-                Identifier resultItemLocation = BuiltInRegistries.ITEM.getKey(result.right().get().getItem());
+                Identifier resultItemLocation = BuiltInRegistries.ITEM.getKey(result.right().get().item().value());
                 build(consumerIn, BrewinAndChewin.MODID + ":fermenting/" + resultItemLocation.getPath() + "_from_" + baseFluidLocation.getPath());
                 return;
             } else if (fluidIngredient.isPresent() && fluidIngredient.get().ingredient() instanceof KegCompatibleFluidIngredients.Tag tag && tag.getTagKey() != null) {
                 Identifier baseFluidLocation = tag.getTagKey().location();
-                Identifier resultItemLocation = BuiltInRegistries.ITEM.getKey(result.right().get().getItem());
+                Identifier resultItemLocation = BuiltInRegistries.ITEM.getKey(result.right().get().item().value());
                 build(consumerIn, BrewinAndChewin.MODID + ":fermenting/" + resultItemLocation.getPath() + "_from_" + baseFluidLocation.getPath());
                 return;
             }
-            Identifier resultItemLocation = BuiltInRegistries.ITEM.getKey(result.right().get().getItem());
+            Identifier resultItemLocation = BuiltInRegistries.ITEM.getKey(result.right().get().item().value());
             build(consumerIn, BrewinAndChewin.MODID + ":fermenting/" + resultItemLocation.getPath());
             return;
         }
@@ -187,7 +197,7 @@ public class KegFermentingRecipeBuilder {
         if (result == null)
             throw new NullPointerException("Fermenting Recipe " + save + " does not specify a result.");
 
-        Identifier resourcelocation = result.map(wrapper -> BuiltInRegistries.FLUID.getKey(wrapper.fluid()), stack -> BuiltInRegistries.ITEM.getKey(stack.getItem()));
+        Identifier resourcelocation = result.map(wrapper -> BuiltInRegistries.FLUID.getKey(wrapper.fluid()), stack -> BuiltInRegistries.ITEM.getKey(stack.item().value()));
         if (resourcelocation.equals(Identifier.tryParse(save))) {
             throw new IllegalStateException("Fermenting Recipe " + save + " should remove its 'save' argument");
         } else {
@@ -206,12 +216,12 @@ public class KegFermentingRecipeBuilder {
     }
 
     public KegFermentingRecipeBuilder addFluidIngredient(TagKey<Fluid> fluid, int i) {
-        fluidIngredient = Optional.of(new FluidIngredientWithAmount(new KegCompatibleFluidIngredients.Tag(HolderSet.emptyNamed(BuiltInRegistries.FLUID.holderOwner(), fluid)), i, Optional.empty()));
+        fluidIngredient = Optional.of(new FluidIngredientWithAmount(new KegCompatibleFluidIngredients.Tag(fluids.getOrThrow(fluid)), i, Optional.empty()));
         return this;
     }
 
     public KegFermentingRecipeBuilder addFluidIngredient(TagKey<Fluid> fluid, int i, FluidUnit unit) {
-        fluidIngredient = Optional.of(new FluidIngredientWithAmount(new KegCompatibleFluidIngredients.Tag(HolderSet.emptyNamed(BuiltInRegistries.FLUID.holderOwner(), fluid)), i, Optional.of(unit)));
+        fluidIngredient = Optional.of(new FluidIngredientWithAmount(new KegCompatibleFluidIngredients.Tag(fluids.getOrThrow(fluid)), i, Optional.of(unit)));
         return this;
     }
 
@@ -224,17 +234,18 @@ public class KegFermentingRecipeBuilder {
     }
 
     public void build(RecipeOutput consumerIn, Identifier id) {
+        ResourceKey<Recipe<?>> recipeKey = ResourceKey.create(Registries.RECIPE, id);
         Identifier advancementId = id.withPath(path -> "recipes/" + path);
+        
         AdvancementHolder builtAdvancement = advancement.build(advancementId);
         if (!builtAdvancement.value().criteria().isEmpty()) {
-            advancement.parent(Identifier.withDefaultNamespace("recipes/root")).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(id))
-                    .rewards(AdvancementRewards.Builder.recipe(id))
+            advancement.parent(net.minecraft.data.recipes.RecipeBuilder.ROOT_RECIPE_ADVANCEMENT).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(recipeKey))
+                    .rewards(AdvancementRewards.Builder.recipe(recipeKey))
                     .requirements(AdvancementRequirements.Strategy.OR);
-            advancement.rewards(AdvancementRewards.Builder.recipe(id));
             builtAdvancement = advancement.build(advancementId);
         } else
             builtAdvancement = null;
-        consumerIn.accept(id, new KegFermentingRecipe(ingredients, tab, fluidIngredient, unit, result, experience, temperature), builtAdvancement);
+        consumerIn.accept(recipeKey, new KegFermentingRecipe(ingredients, tab, fluidIngredient, unit, result, experience, temperature), builtAdvancement);
     }
 
 }

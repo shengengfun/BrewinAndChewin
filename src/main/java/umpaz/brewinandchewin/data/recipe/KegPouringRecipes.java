@@ -91,7 +91,7 @@ public class KegPouringRecipes {
                 .setFluidUnit(FluidUnit.MILLIBUCKETS)
                 .build(consumer);
          */
-        KegPouringRecipeBuilder.kegPouringRecipe(Fluids.WATER, 250, Items.POTION.getDefaultInstance(), true)
+        KegPouringRecipeBuilder.kegPouringRecipe(Fluids.WATER, 250, new net.minecraft.world.item.ItemStackTemplate(Items.POTION), true)
                 .setFluidUnit(FluidUnit.MILLIBUCKET)
                 .withContainer(Items.GLASS_BOTTLE)
                 .build(consumer);
