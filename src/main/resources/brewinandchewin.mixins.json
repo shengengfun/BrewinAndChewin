@@ -27,7 +27,6 @@
     "client.GhostRecipeAccessor",
     "client.GuiMixin",
     "client.LevelRendererAccessor",
-    "client.ModelBakeryAccessor",
     "client.RecipeBookComponentAccessor",
     "client.TipsyDrunkRendererMixin",
     "client.TipsySignRendererMixin$TipsyCanvasSignRenderMixin",

@@ -1,16 +1,9 @@
 package umpaz.brewinandchewin.neoforge.client.platform;
 
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import umpaz.brewinandchewin.common.block.entity.KegBlockEntity;
 import net.minecraft.client.Minecraft;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
@@ -19,37 +12,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.fluids.FluidStack;
 import umpaz.brewinandchewin.common.BnCConfiguration;
 import umpaz.brewinandchewin.common.utility.AbstractedFluidStack;
-import umpaz.brewinandchewin.neoforge.client.model.CoasterWrappedModel;
 import umpaz.brewinandchewin.platform.client.BnCClientPlatformHelper;
 
 public class BnCClientPlatfomHelperNeoForge implements BnCClientPlatformHelper {
-    @Override
-    public BakedModel getModel(Identifier modelId) {
-        return Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(modelId));
-    }
+    // NOTE(26.1): getModel/registerItemProperty/tesselateModel were built on BakedModel,
+    // ModelResourceLocation and ItemProperties#register, all removed in 26.1 (models are
+    // now BlockStateModel/ItemModel; item predicates are JSON range_dispatch). Dropped for
+    // now - see bac-26.1-status.md.
 
     @Override
-    public void registerItemProperty(Item item, Identifier id, ClampedItemPropertyFunction function) {
-        ItemProperties.register(item, id, function);
-    }
-
-    @Override
-    public void tesselateModel(BlockAndTintGetter level, Identifier modelId, BlockState state, BlockPos pos, PoseStack poseStack, MultiBufferSource buffer, RandomSource random, long seed, int packedOverlay, int tintIndex, RenderType renderType) {
-        ModelData data = ModelData.EMPTY;
-        if (tintIndex != -1) {
-            data = ModelData.builder()
-                    .with(CoasterWrappedModel.TINT_INDEX, tintIndex)
-                    .build();
-        }
-        Minecraft.getInstance().getBlockRenderer().getModelRenderer().tesselateBlock(level, Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(modelId)), state, pos, poseStack, buffer.getBuffer(renderType), false, random, seed, packedOverlay, data, renderType);
-    }
-
-    @Override
-    public void renderFluidInKeg(AbstractedFluidStack stack, GuiGraphics gui, int x, int y, float alphaModifier) {
+    public void renderFluidInKeg(AbstractedFluidStack stack, GuiGraphicsExtractor gui, int x, int y, float alphaModifier) {
         IClientFluidTypeExtensions fluidTypeExtensions = IClientFluidTypeExtensions.of(stack.fluid());
         FluidStack fluidStack = (FluidStack) stack.loaderSpecific();
         if (fluidStack == null)
@@ -70,15 +45,15 @@ public class BnCClientPlatfomHelperNeoForge implements BnCClientPlatformHelper {
             float topCapacity = (capacity - 0.57F) / 0.43F;
             float vDistance = sprite.getV1() - sprite.getV0();
             float v0 = sprite.getV0() + (0.25F * vDistance) + (0.75F * vDistance * (1 - topCapacity));
-            gui.innerBlit(sprite.atlasLocation(), x, x + 16, y1, y2, 0, sprite.getU0(), sprite.getU1(), v0, sprite.getV1(), red, green, blue, alpha);
-            gui.innerBlit(sprite.atlasLocation(), x + 16, x + 16 + 8, y1, y2, 0, sprite.getU0(), sprite.getU0() + 0.5F * (sprite.getU1() - sprite.getU0()), v0, sprite.getV1(), red, green, blue, alpha);
+            gui.blit(sprite.atlasLocation(), x, y1, 16, y2 - y1, sprite.getU0(), sprite.getU1(), v0, sprite.getV1());
+            gui.blit(sprite.atlasLocation(), x + 16, y1, 8, y2 - y1, sprite.getU0(), sprite.getU0() + 0.5F * (sprite.getU1() - sprite.getU0()), v0, sprite.getV1());
 
         }
         int y1 = y + 12 + (int) (16 * (1 - Math.min(1, (capacity / .57F))));
         int y2 = y + 12 + 16;
         float vDistance = sprite.getV1() - sprite.getV0();
         float v0 = sprite.getV0() + (vDistance * (1 - Math.min(1, (capacity / .57F))));
-        gui.innerBlit(sprite.atlasLocation(), x, x + 16, y1, y2, 0, sprite.getU0(), sprite.getU1(), v0, sprite.getV1(), red, green, blue, alpha);
-        gui.innerBlit(sprite.atlasLocation(), x + 16, x + 16 + 8, y1, y2, 0, sprite.getU0(), sprite.getU0() + 0.5F * (sprite.getU1() - sprite.getU0()), v0, sprite.getV1(), red, green, blue, alpha);
+        gui.blit(sprite.atlasLocation(), x, y1, 16, y2 - y1, sprite.getU0(), sprite.getU1(), v0, sprite.getV1());
+        gui.blit(sprite.atlasLocation(), x + 16, y1, 8, y2 - y1, sprite.getU0(), sprite.getU0() + 0.5F * (sprite.getU1() - sprite.getU0()), v0, sprite.getV1());
     }
 }

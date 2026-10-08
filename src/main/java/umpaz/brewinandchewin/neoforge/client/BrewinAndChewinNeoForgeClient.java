@@ -1,10 +1,6 @@
 package umpaz.brewinandchewin.neoforge.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -21,11 +17,9 @@ import umpaz.brewinandchewin.client.BrewinAndChewinClient;
 import umpaz.brewinandchewin.client.gui.AgingCaskScreen;
 import umpaz.brewinandchewin.client.gui.KegScreen;
 import umpaz.brewinandchewin.client.gui.KegTooltip;
-import umpaz.brewinandchewin.common.mixin.client.ModelBakeryAccessor;
 import umpaz.brewinandchewin.common.registry.BnCMenuTypes;
 import umpaz.brewinandchewin.neoforge.client.gui.BnCHUDOverlays;
 import umpaz.brewinandchewin.BrewinAndChewin;
-import umpaz.brewinandchewin.neoforge.client.model.CoasterWrappedModel;
 import umpaz.brewinandchewin.client.renderer.CoasterBlockEntityRenderer;
 import umpaz.brewinandchewin.common.fluid.BnCFluidConstants;
 import umpaz.brewinandchewin.neoforge.client.platform.BnCClientPlatfomHelperNeoForge;
@@ -38,6 +32,8 @@ import java.util.List;
 public class BrewinAndChewinNeoForgeClient {
     public BrewinAndChewinNeoForgeClient(IEventBus eventBus) {
         BrewinAndChewinClient.init(new BnCClientPlatfomHelperNeoForge());
+        // 26.1 dropped EventBusSubscriber.Bus, so the mod-bus client handlers are registered here.
+        eventBus.register(ModEvents.class);
         BnCHUDOverlays.init(eventBus);
         BrewinAndChewin.isClient = true;
     }
@@ -50,7 +46,6 @@ public class BrewinAndChewinNeoForgeClient {
         }
     }
 
-    @EventBusSubscriber(modid = BrewinAndChewin.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ModEvents {
         @SubscribeEvent
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
@@ -61,11 +56,6 @@ public class BrewinAndChewinNeoForgeClient {
         @SubscribeEvent
         public static void registerItemProperties(FMLClientSetupEvent event) {
             event.enqueueWork(BnCClientSetup::registerItemProperties);
-        }
-
-        @SubscribeEvent
-        public static void registerItemColorHandlers(RegisterColorHandlersEvent.Item event) {
-            BnCClientSetup.registerItemColorHandlers(event::register);
         }
 
         @SubscribeEvent
@@ -174,39 +164,12 @@ public class BrewinAndChewinNeoForgeClient {
         }
 
         @SubscribeEvent
-        public static void registerReloadListeners(RegisterClientReloadListenersEvent event) {
-            BnCClientSetup.registerReloadListeners(event::registerReloadListener);
+        public static void registerReloadListeners(AddClientReloadListenersEvent event) {
+            BnCClientSetup.registerReloadListeners(event::addListener);
         }
 
-        @SubscribeEvent
-        public static void registerColorHandlers(RegisterColorHandlersEvent.Block event) {
-            BnCClientSetup.registerColorHandlers(event::register);
-        }
-
-        @SubscribeEvent
-        public static void registerModels(ModelEvent.RegisterAdditional event) {
-            CoasterBlockEntityRenderer.resetCache();
-            MODELS.addAll(BnCClientSetup.getModels(Minecraft.getInstance().getResourceManager(), Runnable::run).join());
-            event.register(ModelResourceLocation.standalone(BrewinAndChewin.asResource("block/coaster")));
-            event.register(ModelResourceLocation.standalone(BrewinAndChewin.asResource("block/coaster_tray")));
-            for (Identifier model : BnCClientSetup.getBottleRackModels()) {
-                event.register(ModelResourceLocation.standalone(model));
-            }
-        }
-
-        @SubscribeEvent
-        public static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
-            for (Identifier entry : MODELS) {
-                event.getModels().put(ModelResourceLocation.standalone(entry.withPath(path -> "brewinandchewin/coaster/" + path)), new CoasterWrappedModel(bakeModel(event, entry)));
-            }
-            MODELS.clear();
-        }
-
-        private static BakedModel bakeModel(ModelEvent.ModifyBakingResult event, Identifier path) {
-            UnbakedModel unbaked = ((ModelBakeryAccessor)event.getModelBakery()).brewinandchewin$getModel(path);
-            unbaked.resolveParents(location -> ((ModelBakeryAccessor)event.getModelBakery()).brewinandchewin$getModel(location));
-            ModelResourceLocation modelResource = ModelResourceLocation.standalone(path);
-            return unbaked.bake(event.getModelBakery().new ModelBakerImpl((rl, material) -> material.sprite(), modelResource), event.getTextureGetter(), BlockModelRotation.X0_Y0);
-        }
+        // NOTE(26.1): the coaster's dynamic wrapped model relied on BakedModel/
+        // ModelBakery/ModelResourceLocation, all removed in 26.1. It needs a rewrite onto
+        // BlockStateModel/ItemModel before it can come back; see bac-26.1-status.md.
     }
 }
