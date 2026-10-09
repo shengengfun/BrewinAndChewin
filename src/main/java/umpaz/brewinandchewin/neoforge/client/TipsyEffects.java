@@ -9,19 +9,15 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientChatReceivedEvent;
-import net.neoforged.neoforge.client.event.RenderNameTagEvent;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.client.utility.BnCClientTextUtils;
 import umpaz.brewinandchewin.neoforge.client.integration.IntoxicationAppleSkinCompatNeoForge;
 
 @EventBusSubscriber(modid = BrewinAndChewin.MODID, value = Dist.CLIENT)
 public class TipsyEffects {
-    @SubscribeEvent
-    public static void whatsYourName(RenderNameTagEvent event) {
-//        Component newName = BnCClientTextUtils.nameTagRenderer(event.getContent());
-//        if (event.getContent() != newName)
-//            event.setContent(newName);
-    }
+    // 26.1's RenderNameTagEvent is abstract (concrete: CanRender / DoRender); the old handler
+    // registered against the base class, which NeoForge rejects at class load. Its body was
+    // already disabled, so it is gone until the name-tag effect is ported.
 
     @SubscribeEvent
     public static void iCanHear(ClientChatReceivedEvent.Player event) {
