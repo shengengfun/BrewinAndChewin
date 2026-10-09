@@ -10,6 +10,13 @@ import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.block.entity.AgingCaskBlockEntity;
 import umpaz.brewinandchewin.common.block.entity.container.AgingCaskMenu;
 
+/**
+ * The aging cask's screen.
+ *
+ * <p>The panel is 176x178: this port ships a taller aging cask texture than 1.21.1 did, and
+ * {@code AgingCaskMenu} lays its player inventory out for that height, so the screen follows the
+ * menu rather than the 1.21.1 constants.
+ */
 public class AgingCaskScreen extends AbstractContainerScreen<AgingCaskMenu> {
     public static final Identifier BACKGROUND_TEXTURE = BrewinAndChewin.asResource("textures/gui/aging_cask.png");
 
@@ -42,9 +49,8 @@ public class AgingCaskScreen extends AbstractContainerScreen<AgingCaskMenu> {
     private static final int ARROW_HEIGHT = 16;
 
     public AgingCaskScreen(AgingCaskMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, 176, 166);
+        super(menu, inventory, title, 176, 178);
         this.titleLabelY = 3;
-        this.inventoryLabelY = 75;
     }
 
     private void blitSheet(GuiGraphicsExtractor graphics, int x, int y, int u, int v, int width, int height) {
