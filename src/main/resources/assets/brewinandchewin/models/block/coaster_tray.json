@@ -3,6 +3,7 @@
   "render_type": "minecraft:cutout",
   "parent": "block/block",
   "textures": {
+    "particle": "#tray",
     "tray": "farmersdelight:block/tray",
     "tray_top": "brewinandchewin:block/tray_top",
     "tray_bottom": "farmersdelight:block/tray_bottom"
