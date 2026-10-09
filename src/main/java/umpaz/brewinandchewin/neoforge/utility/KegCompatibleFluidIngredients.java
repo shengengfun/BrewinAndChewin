@@ -63,7 +63,9 @@ public class KegCompatibleFluidIngredients {
         }
 
         public Exact(Fluid fluid, PatchedDataComponentMap components) {
-            displayStack = new AbstractedFluidStack(fluid, DISPLAY_AMOUNT, components, FluidUnit.MILLIBUCKET, new FluidStack(fluid.builtInRegistryHolder(), DISPLAY_AMOUNT, components.asPatch()));
+            // loaderSpecific stays null so the FluidStack is only built on demand - these
+            // ingredients are decoded while datapacks load, before fluid components are bound.
+            displayStack = new AbstractedFluidStack(fluid, DISPLAY_AMOUNT, components, FluidUnit.MILLIBUCKET, null);
         }
 
         public Exact(Fluid fluid, DataComponentPatch patch) {
@@ -123,7 +125,7 @@ public class KegCompatibleFluidIngredients {
         public List<AbstractedFluidStack> displayStacks() {
             if (fluidTag.size() > 0 && fluidStacks.isEmpty()) {
                 for (Holder<Fluid> fluidHolder :  fluidTag) {
-                    fluidStacks.add(new AbstractedFluidStack(fluidHolder.value(), DISPLAY_AMOUNT, components, FluidUnit.MILLIBUCKET, new FluidStack(fluidHolder, DISPLAY_AMOUNT, components.asPatch())));
+                    fluidStacks.add(new AbstractedFluidStack(fluidHolder.value(), DISPLAY_AMOUNT, components, FluidUnit.MILLIBUCKET, null));
                 }
             }
             return fluidStacks;
@@ -146,7 +148,7 @@ public class KegCompatibleFluidIngredients {
 
         public NeoForgeIngredient(FluidIngredient ingredient) {
             this.ingredient = ingredient;
-            displayStacks = ingredient.fluids().stream().map(fluidHolder -> new AbstractedFluidStack(fluidHolder.value(), DISPLAY_AMOUNT, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, DataComponentPatch.EMPTY), FluidUnit.MILLIBUCKET, new FluidStack(fluidHolder, DISPLAY_AMOUNT))).toList();
+            displayStacks = ingredient.fluids().stream().map(fluidHolder -> new AbstractedFluidStack(fluidHolder.value(), DISPLAY_AMOUNT, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, DataComponentPatch.EMPTY), FluidUnit.MILLIBUCKET, null)).toList();
         }
 
         @Override

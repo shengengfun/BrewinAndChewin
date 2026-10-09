@@ -22,6 +22,8 @@ public class BnCNeoForgeCodecs {
                     FluidUnit.CODEC.optionalFieldOf("unit", FluidUnit.MILLIBUCKET).forGetter(AbstractedFluidStack::unit),
                     DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY).forGetter(fluidStack -> fluidStack.components() instanceof PatchedDataComponentMap patched ? patched.asPatch() : DataComponentPatch.EMPTY))
             .apply(inst, (t1, t2, t3, t4) ->
-                    new AbstractedFluidStack(t1.value(), t2, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, t4), t3, new FluidStack(t1, (int)t3.convert(t2, FluidUnit.MILLIBUCKET), t4))));
+                    // The FluidStack is built lazily: this codec also runs while datapacks are
+                    // parsed, which is before fluid component initializers have been applied.
+                    new AbstractedFluidStack(t1.value(), t2, PatchedDataComponentMap.fromPatch(DataComponentMap.EMPTY, t4), t3, null)));
 
 }

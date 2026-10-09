@@ -7,7 +7,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "brewinandchewin:wine_old",
+          "name": "brewinandchewin:old_wine",
           "weight": 1,
           "functions": [
             {
