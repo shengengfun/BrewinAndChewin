@@ -17,6 +17,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.minecraft.world.level.Level;
 import umpaz.brewinandchewin.common.crafting.FermentingBookCategory;
 import umpaz.brewinandchewin.common.BnCConfiguration;
@@ -201,6 +203,20 @@ public class KegFermentingRecipe implements Recipe<KegRecipeWrapper> {
             case DRINKS -> BnCRecipeBookCategories.FERMENTING_DRINKS;
             case MISC -> BnCRecipeBookCategories.FERMENTING_MISC;
         };
+    }
+
+    /**
+     * 26.1 builds the recipe book from this rather than from the recipe itself, so the keg hands its
+     * item grid, fluid ingredient, result, duration and temperature over to a {@link KegRecipeDisplay}.
+     */
+    @Override
+    public List<RecipeDisplay> display() {
+        List<SlotDisplay> inputs = new ArrayList<>(this.inputItems.size());
+        for (Ingredient ingredient : this.inputItems) {
+            inputs.add(ingredient.display());
+        }
+        return List.of(new KegRecipeDisplay(inputs, this.fluidIngredient, this.result,
+                this.getFermentTime(), this.temperature, this.experience));
     }
 
     @Override

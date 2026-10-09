@@ -8,9 +8,14 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RegisterRecipeBookSearchCategoriesEvent;
+import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -21,9 +26,16 @@ import umpaz.brewinandchewin.client.gui.KegScreen;
 import umpaz.brewinandchewin.client.gui.KegTooltip;
 import umpaz.brewinandchewin.client.particle.DrunkBubbleParticle;
 import umpaz.brewinandchewin.client.particle.RagingParticle;
+import umpaz.brewinandchewin.client.renderer.BnCStandaloneModels;
+import umpaz.brewinandchewin.client.renderer.BottleRackBlockEntityRenderer;
+import umpaz.brewinandchewin.client.renderer.CoasterBlockEntityRenderer;
+import umpaz.brewinandchewin.client.renderer.CoasterModelLoader;
+import umpaz.brewinandchewin.client.utility.BnCFluidItemDisplays;
+import umpaz.brewinandchewin.common.registry.BnCBlockEntityTypes;
 import umpaz.brewinandchewin.common.registry.BnCFluids;
 import umpaz.brewinandchewin.common.registry.BnCMenuTypes;
 import umpaz.brewinandchewin.common.registry.BnCParticleTypes;
+import umpaz.brewinandchewin.common.registry.BnCRecipeBookCategories;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.fluid.BnCFluidConstants;
 import umpaz.brewinandchewin.neoforge.client.platform.BnCClientPlatfomHelperNeoForge;
@@ -50,6 +62,32 @@ public class BrewinAndChewinNeoForgeClient {
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
             event.register(BnCMenuTypes.KEG, KegScreen::new);
             event.register(BnCMenuTypes.AGING_CASK, AgingCaskScreen::new);
+        }
+
+        @SubscribeEvent
+        public static void registerClientReloadListeners(AddClientReloadListenersEvent event) {
+            event.addListener(BrewinAndChewin.asResource("fluid_item_displays"), BnCFluidItemDisplays.Loader.INSTANCE);
+            event.addListener(CoasterModelLoader.ID, CoasterModelLoader.INSTANCE);
+        }
+
+        @SubscribeEvent
+        public static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
+            BnCStandaloneModels.KEYS.forEach((id, key) ->
+                    event.register(key, SimpleUnbakedStandaloneModel.simpleModelWrapper(id)));
+        }
+
+        @SubscribeEvent
+        public static void registerBlockEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(BnCBlockEntityTypes.COASTER, CoasterBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(BnCBlockEntityTypes.BOTTLE_RACK, BottleRackBlockEntityRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void registerRecipeBookSearchCategories(RegisterRecipeBookSearchCategoriesEvent event) {
+            event.register(BnCRecipeBookCategories.FERMENTING_SEARCH,
+                    BnCRecipeBookCategories.FERMENTING_DRINKS,
+                    BnCRecipeBookCategories.FERMENTING_MEALS,
+                    BnCRecipeBookCategories.FERMENTING_MISC);
         }
 
         @SubscribeEvent

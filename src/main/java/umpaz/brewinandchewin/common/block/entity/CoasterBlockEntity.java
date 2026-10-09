@@ -11,6 +11,7 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import umpaz.brewinandchewin.common.block.CoasterBlock;
 import umpaz.brewinandchewin.common.registry.BnCBlockEntityTypes;
 import umpaz.brewinandchewin.common.registry.BnCBlocks;
@@ -30,13 +32,30 @@ import static umpaz.brewinandchewin.common.block.CoasterBlock.SIZE;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public class CoasterBlockEntity extends SyncedBlockEntity implements Clearable {
+public class CoasterBlockEntity extends SyncedBlockEntity implements Clearable, ItemOwner {
 
     public final NonNullList<ItemStack> inventory = NonNullList.withSize(4, ItemStack.EMPTY);
 
     public CoasterBlockEntity(BlockPos pos, BlockState state ) {
       super(BnCBlockEntityTypes.COASTER, pos, state);
    }
+
+    // 26.1 resolves item models through an ItemOwner, so the coaster exposes itself the way
+    // vanilla's shelf block entity does.
+    @Override
+    public Level level() {
+        return this.level;
+    }
+
+    @Override
+    public Vec3 position() {
+        return this.getBlockPos().getCenter();
+    }
+
+    @Override
+    public float getVisualRotationYInDegrees() {
+        return 0.0F;
+    }
 
     public InteractionResult useItemOn(ItemStack stack, Level level, BlockState state, BlockPos pos, Player player, InteractionHand hand) {
         if (!player.getAbilities().mayBuild)

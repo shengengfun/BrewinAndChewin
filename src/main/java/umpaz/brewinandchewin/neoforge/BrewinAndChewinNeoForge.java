@@ -99,6 +99,7 @@ public class BrewinAndChewinNeoForge {
             register(event, Registries.PARTICLE_TYPE, BnCParticleTypes::registerAll);
             register(event, Registries.RECIPE_TYPE, BnCRecipeTypes::registerAll);
             register(event, Registries.RECIPE_BOOK_CATEGORY, BnCRecipeBookCategories::registerAll);
+            register(event, Registries.RECIPE_DISPLAY, BnCRecipeDisplays::registerAll);
             register(event, Registries.RECIPE_SERIALIZER, BnCRecipeSerializers::registerAll);
         }
 
