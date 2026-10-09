@@ -15,6 +15,8 @@ import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterRecipeBookSearchCategoriesEvent;
+import net.neoforged.neoforge.client.event.RenderNameTagEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -30,6 +32,7 @@ import umpaz.brewinandchewin.client.renderer.BnCStandaloneModels;
 import umpaz.brewinandchewin.client.renderer.BottleRackBlockEntityRenderer;
 import umpaz.brewinandchewin.client.renderer.CoasterBlockEntityRenderer;
 import umpaz.brewinandchewin.client.renderer.CoasterModelLoader;
+import umpaz.brewinandchewin.client.utility.BnCClientTextUtils;
 import umpaz.brewinandchewin.client.utility.BnCFluidItemDisplays;
 import umpaz.brewinandchewin.common.registry.BnCBlockEntityTypes;
 import umpaz.brewinandchewin.common.registry.BnCFluids;
@@ -38,7 +41,12 @@ import umpaz.brewinandchewin.common.registry.BnCParticleTypes;
 import umpaz.brewinandchewin.common.registry.BnCRecipeBookCategories;
 import umpaz.brewinandchewin.BrewinAndChewin;
 import umpaz.brewinandchewin.common.fluid.BnCFluidConstants;
+import umpaz.brewinandchewin.common.registry.BnCEffects;
 import umpaz.brewinandchewin.neoforge.client.platform.BnCClientPlatfomHelperNeoForge;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 
 @Mod(value = BrewinAndChewin.MODID, dist = Dist.CLIENT)
 public class BrewinAndChewinNeoForgeClient {
@@ -54,6 +62,56 @@ public class BrewinAndChewinNeoForgeClient {
         @SubscribeEvent
         public static void onItemTooltip(ItemTooltipEvent event) {
             BnCClientSetup.appendLabelTooltip(event.getItemStack(), event.getToolTip(), event.getContext().tickRate());
+        }
+
+        /**
+         * Scrambles name plates for a drunk player.
+         *
+         * <p>{@code RenderNameTagEvent} itself is abstract, so it can only be listened to through
+         * its {@code CanRender}/{@code DoRender} subclasses - subscribing to the base type throws at
+         * class load. {@code CanRender} hands over the text before it is submitted, which is exactly
+         * what the 1.21.1 name tag mixin was reaching for.
+         */
+        @SubscribeEvent
+        public static void onRenderNameTag(RenderNameTagEvent.CanRender event) {
+            Component content = event.getContent();
+            if (content == null) {
+                return;
+            }
+            Component scrambled = BnCClientTextUtils.nameTagRenderer(content);
+            if (scrambled != content) {
+                event.setContent(scrambled);
+            }
+        }
+
+        /**
+         * The tipsy camera wobble.
+         *
+         * <p>1.21.1 hooked {@code GameRenderer#renderLevel} and rotated the level's pose stack.
+         * 26.1 builds the level matrices from the camera render state instead, so the wobble is
+         * applied to the camera angles - which is both simpler and gets it right for the culling
+         * frustum, which the old hook had to patch separately.
+         */
+        @SubscribeEvent
+        public static void onComputeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
+            Player player = Minecraft.getInstance().player;
+            if (player == null || !player.hasEffect(BnCEffects.TIPSY)) {
+                return;
+            }
+
+            double screenEffectScale = Minecraft.getInstance().options.screenEffectScale().get();
+            if (screenEffectScale <= 0.0) {
+                return;
+            }
+
+            int strength = Math.min(player.getEffect(BnCEffects.TIPSY).getAmplifier(), 11);
+            float scaledStrength = (float) (strength * screenEffectScale);
+            float ticks = player.tickCount + (float) event.getPartialTick();
+
+            // left and right, up and down, and a slow roll
+            event.setYaw(event.getYaw() + Mth.cos(3 + ticks * 0.0295F) * scaledStrength);
+            event.setPitch(event.getPitch() + Mth.sin(27 + ticks * 0.0132F) * scaledStrength * 0.5F);
+            event.setRoll(event.getRoll() + Mth.sin(11 + ticks * 0.0197F) * scaledStrength);
         }
     }
 

@@ -23,7 +23,9 @@
     "StoreLootParamsMixin$LootParamsMixin"
   ],
   "client": [
-    "client.ChatListenerMixin"
+    "client.ChatListenerMixin",
+    "client.GuiMixin",
+    "client.TipsySignRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
